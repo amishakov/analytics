@@ -7,10 +7,10 @@
     <meta name="generator" content="ExDoc v0.28.5">
     <meta name="project" content="Plausible v0.0.1">
 
-    <title>PlausibleWeb.AutoAuthPlug — Plausible v0.0.1</title>
+    <title>Plausible.Site.RateLimiter — Plausible v0.0.1</title>
     <link rel="stylesheet" href="dist/elixir-64c5e2b63575bddb1c5b.css" />
 
-    <script src="dist/sidebar_items-e0ac7d3171.js"></script>
+    <script src="dist/sidebar_items-635fe6ee6b.js"></script>
 
       <script src="docs_config.js"></script>
 
@@ -100,16 +100,29 @@ Plausible
 </button>
 
 
-    <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/plugs/auto_auth_plug.ex#L1" title="View Source" class="view-source" rel="help">
+    <a href="https://github.com/plausible/analytics/blob/main/lib/plausible/site/cache/rate_limiter.ex#L1" title="View Source" class="view-source" rel="help">
       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
       <span class="sr-only">View Source</span>
     </a>
 
-  <span translate="no">PlausibleWeb.AutoAuthPlug</span> 
+  <span translate="no">Plausible.Site.RateLimiter</span> 
   <small class="app-vsn" translate="no">(Plausible v0.0.1)</small>
 
 </h1>
 
+
+  <section id="moduledoc">
+<p>Thin wrapper around Hammer for rate limiting domain-specific events
+during the ingestion phase. Currently there are two policies
+on which the <code class="inline">allow/2</code> function operates:</p><ul><li><code class="inline">:allow</code></li><li><code class="inline">:deny</code></li></ul><p>Rate Limiting buckets are configured per site (externally via the CRM).
+See: <a href="Plausible.Site.html"><code class="inline">Plausible.Site</code></a></p><p>To look up each site's configuration, the RateLimiter fetches
+a Site by domain using <code class="inline">Plausible.Cache</code> interface.
+If the Site is not found in Cache, a DB refresh attempt is made.
+The result of that last attempt gets stored in Cache to prevent
+excessive DB queries.</p><p>The module defines two policies outside the regular bucket inspection:</p><ul><li>when the site does not exist in the database: deny</li><li>when the underlying rate limiting mechanism returns
+an internal error: allow</li></ul><p>Each policy computation emits a single telemetry event.
+See: <a href="#policy_telemetry_event/1"><code class="inline">policy_telemetry_event/1</code></a></p>
+  </section>
 
 
   <section id="summary" class="details-list">
@@ -128,7 +141,7 @@ Plausible
 
       <div class="summary-row">
         <div class="summary-signature">
-          <a href="#call/2" translate="no">call(conn, opts)</a>
+          <a href="#allow?/2" translate="no">allow?(domain, opts \\ [])</a>
 
         </div>
 
@@ -136,7 +149,15 @@ Plausible
 
       <div class="summary-row">
         <div class="summary-signature">
-          <a href="#init/1" translate="no">init(options)</a>
+          <a href="#key/1" translate="no">key(domain)</a>
+
+        </div>
+
+      </div>
+
+      <div class="summary-row">
+        <div class="summary-signature">
+          <a href="#policy_telemetry_event/1" translate="no">policy_telemetry_event(policy)</a>
 
         </div>
 
@@ -156,16 +177,18 @@ Plausible
 Functions
     </h1>
     <div class="functions-list">
-<section class="detail" id="call/2">
+<section class="detail" id="allow?/2">
+
+    <span id="allow?/1"></span>
 
   <div class="detail-header">
-    <a href="#call/2" class="detail-link" title="Link to this function">
+    <a href="#allow?/2" class="detail-link" title="Link to this function">
       <i class="ri-link-m" aria-hidden="true"></i>
       <span class="sr-only">Link to this function</span>
     </a>
-    <h1 class="signature" translate="no">call(conn, opts)</h1>
+    <h1 class="signature" translate="no">allow?(domain, opts \\ [])</h1>
 
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/plugs/auto_auth_plug.ex#L9" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible/site/cache/rate_limiter.ex#L35" class="view-source" rel="help" title="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
        <span class="sr-only">View Source</span>
      </a>
@@ -174,20 +197,26 @@ Functions
   </div>
 
   <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> allow?(<a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="https://hexdocs.pm/elixir/Keyword.html#t:t/0">Keyword.t</a>()) :: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">boolean</a>()</pre>
+
+      </div>
 
 
   </section>
 </section>
-<section class="detail" id="init/1">
+<section class="detail" id="key/1">
 
   <div class="detail-header">
-    <a href="#init/1" class="detail-link" title="Link to this function">
+    <a href="#key/1" class="detail-link" title="Link to this function">
       <i class="ri-link-m" aria-hidden="true"></i>
       <span class="sr-only">Link to this function</span>
     </a>
-    <h1 class="signature" translate="no">init(options)</h1>
+    <h1 class="signature" translate="no">key(domain)</h1>
 
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/plugs/auto_auth_plug.ex#L5" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible/site/cache/rate_limiter.ex#L40" class="view-source" rel="help" title="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
        <span class="sr-only">View Source</span>
      </a>
@@ -196,6 +225,40 @@ Functions
   </div>
 
   <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> key(<a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()) :: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="policy_telemetry_event/1">
+
+  <div class="detail-header">
+    <a href="#policy_telemetry_event/1" class="detail-link" title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">policy_telemetry_event(policy)</h1>
+
+      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible/site/cache/rate_limiter.ex#L45" class="view-source" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> policy_telemetry_event(:allow | :deny) :: [<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">atom</a>()]</pre>
+
+      </div>
 
 
   </section>

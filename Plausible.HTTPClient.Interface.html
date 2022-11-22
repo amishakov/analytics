@@ -10,7 +10,7 @@
     <title>Plausible.HTTPClient.Interface — Plausible v0.0.1</title>
     <link rel="stylesheet" href="dist/elixir-64c5e2b63575bddb1c5b.css" />
 
-    <script src="dist/sidebar_items-e0ac7d3171.js"></script>
+    <script src="dist/sidebar_items-635fe6ee6b.js"></script>
 
       <script src="docs_config.js"></script>
 
@@ -128,6 +128,14 @@ Plausible
 
       <div class="summary-row">
         <div class="summary-signature">
+          <a href="#t:finch_request_opts/0" translate="no">finch_request_opts()</a>
+
+        </div>
+
+      </div>
+
+      <div class="summary-row">
+        <div class="summary-signature">
           <a href="#t:headers/0" translate="no">headers()</a>
 
         </div>
@@ -189,6 +197,14 @@ Plausible
 
       </div>
 
+      <div class="summary-row">
+        <div class="summary-signature">
+          <a href="#c:post/4" translate="no">post(url, headers, params, finch_request_opts)</a>
+
+        </div>
+
+      </div>
+
   </div>
 
   </section>
@@ -203,6 +219,34 @@ Plausible
 Types
     </h1>
     <div class="types-list">
+<section class="detail" id="t:finch_request_opts/0">
+
+  <div class="detail-header">
+    <a href="#t:finch_request_opts/0" class="detail-link" title="Link to this type">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature" translate="no">finch_request_opts()</h1>
+
+      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible/http_client.ex#L14" class="view-source" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@type</span> finch_request_opts() :: <a href="https://hexdocs.pm/elixir/Keyword.html#t:t/0">Keyword.t</a>()</pre>
+
+      </div>
+
+
+  </section>
+</section>
 <section class="detail" id="t:headers/0">
 
   <div class="detail-header">
@@ -212,7 +256,7 @@ Types
     </a>
     <h1 class="signature" translate="no">headers()</h1>
 
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible/http_client.ex#L15" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible/http_client.ex#L16" class="view-source" rel="help" title="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
        <span class="sr-only">View Source</span>
      </a>
@@ -240,7 +284,7 @@ Types
     </a>
     <h1 class="signature" translate="no">params()</h1>
 
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible/http_client.ex#L16" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible/http_client.ex#L17" class="view-source" rel="help" title="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
        <span class="sr-only">View Source</span>
      </a>
@@ -268,7 +312,7 @@ Types
     </a>
     <h1 class="signature" translate="no">response()</h1>
 
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible/http_client.ex#L17" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible/http_client.ex#L18" class="view-source" rel="help" title="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
        <span class="sr-only">View Source</span>
      </a>
@@ -299,7 +343,7 @@ Types
     </a>
     <h1 class="signature" translate="no">url()</h1>
 
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible/http_client.ex#L14" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible/http_client.ex#L15" class="view-source" rel="help" title="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
        <span class="sr-only">View Source</span>
      </a>
@@ -340,7 +384,7 @@ Callbacks
     </a>
     <h1 class="signature" translate="no">get(url)</h1>
 
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible/http_client.ex#L22" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible/http_client.ex#L23" class="view-source" rel="help" title="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
        <span class="sr-only">View Source</span>
      </a>
@@ -368,7 +412,7 @@ Callbacks
     </a>
     <h1 class="signature" translate="no">get(url, headers)</h1>
 
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible/http_client.ex#L21" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible/http_client.ex#L22" class="view-source" rel="help" title="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
        <span class="sr-only">View Source</span>
      </a>
@@ -396,7 +440,7 @@ Callbacks
     </a>
     <h1 class="signature" translate="no">post(url, headers, params)</h1>
 
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible/http_client.ex#L23" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible/http_client.ex#L24" class="view-source" rel="help" title="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
        <span class="sr-only">View Source</span>
      </a>
@@ -409,6 +453,34 @@ Callbacks
       <div class="specs">
 
           <pre translate="no"><span class="attribute">@callback</span> post(<a href="#t:url/0">url</a>(), <a href="#t:headers/0">headers</a>(), <a href="#t:params/0">params</a>()) :: <a href="#t:response/0">response</a>()</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="c:post/4">
+
+  <div class="detail-header">
+    <a href="#c:post/4" class="detail-link" title="Link to this callback">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this callback</span>
+    </a>
+    <h1 class="signature" translate="no">post(url, headers, params, finch_request_opts)</h1>
+
+      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible/http_client.ex#L25" class="view-source" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@callback</span> post(<a href="#t:url/0">url</a>(), <a href="#t:headers/0">headers</a>(), <a href="#t:params/0">params</a>(), <a href="#t:finch_request_opts/0">finch_request_opts</a>()) :: <a href="#t:response/0">response</a>()</pre>
 
       </div>
 

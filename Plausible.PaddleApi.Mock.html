@@ -7,10 +7,10 @@
     <meta name="generator" content="ExDoc v0.28.5">
     <meta name="project" content="Plausible v0.0.1">
 
-    <title>PlausibleWeb.PageView — Plausible v0.0.1</title>
+    <title>Plausible.PaddleApi.Mock — Plausible v0.0.1</title>
     <link rel="stylesheet" href="dist/elixir-64c5e2b63575bddb1c5b.css" />
 
-    <script src="dist/sidebar_items-e0ac7d3171.js"></script>
+    <script src="dist/sidebar_items-635fe6ee6b.js"></script>
 
       <script src="docs_config.js"></script>
 
@@ -100,12 +100,12 @@ Plausible
 </button>
 
 
-    <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/views/page_view.ex#L1" title="View Source" class="view-source" rel="help">
+    <a href="https://github.com/plausible/analytics/blob/main/test/support/paddle_api_mock.ex#L1" title="View Source" class="view-source" rel="help">
       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
       <span class="sr-only">View Source</span>
     </a>
 
-  <span translate="no">PlausibleWeb.PageView</span> 
+  <span translate="no">Plausible.PaddleApi.Mock</span> 
   <small class="app-vsn" translate="no">(Plausible v0.0.1)</small>
 
 </h1>
@@ -128,17 +128,7 @@ Plausible
 
       <div class="summary-row">
         <div class="summary-signature">
-          <a href="#__resource__/0" translate="no">__resource__()</a>
-
-        </div>
-
-          <div class="summary-synopsis"><p>The resource name, as an atom, for this view</p></div>
-
-      </div>
-
-      <div class="summary-row">
-        <div class="summary-signature">
-          <a href="#admin_email/0" translate="no">admin_email()</a>
+          <a href="#get_invoices/1" translate="no">get_invoices(subscription)</a>
 
         </div>
 
@@ -146,7 +136,7 @@ Plausible
 
       <div class="summary-row">
         <div class="summary-signature">
-          <a href="#base_domain/0" translate="no">base_domain()</a>
+          <a href="#get_subscription/1" translate="no">get_subscription(_)</a>
 
         </div>
 
@@ -154,31 +144,9 @@ Plausible
 
       <div class="summary-row">
         <div class="summary-signature">
-          <a href="#plausible_url/0" translate="no">plausible_url()</a>
+          <a href="#update_subscription/2" translate="no">update_subscription(_, map)</a>
 
         </div>
-
-      </div>
-
-      <div class="summary-row">
-        <div class="summary-signature">
-          <a href="#render/2" translate="no">render(template, assigns \\ %{})</a>
-
-        </div>
-
-          <div class="summary-synopsis"><p>Renders the given template locally.</p></div>
-
-      </div>
-
-      <div class="summary-row">
-        <div class="summary-signature">
-          <a href="#template_not_found/2" translate="no">template_not_found(template, assigns)</a>
-
-        </div>
-
-          <div class="summary-synopsis"><p>Callback invoked when no template is found.
-By default it raises but can be customized
-to render a particular template.</p></div>
 
       </div>
 
@@ -196,38 +164,16 @@ to render a particular template.</p></div>
 Functions
     </h1>
     <div class="functions-list">
-<section class="detail" id="__resource__/0">
+<section class="detail" id="get_invoices/1">
 
   <div class="detail-header">
-    <a href="#__resource__/0" class="detail-link" title="Link to this function">
+    <a href="#get_invoices/1" class="detail-link" title="Link to this function">
       <i class="ri-link-m" aria-hidden="true"></i>
       <span class="sr-only">Link to this function</span>
     </a>
-    <h1 class="signature" translate="no">__resource__()</h1>
+    <h1 class="signature" translate="no">get_invoices(subscription)</h1>
 
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/views/page_view.ex#L2" class="view-source" rel="help" title="View Source">
-       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
-       <span class="sr-only">View Source</span>
-     </a>
-
-
-  </div>
-
-  <section class="docstring">
-
-<p>The resource name, as an atom, for this view</p>
-  </section>
-</section>
-<section class="detail" id="admin_email/0">
-
-  <div class="detail-header">
-    <a href="#admin_email/0" class="detail-link" title="Link to this function">
-      <i class="ri-link-m" aria-hidden="true"></i>
-      <span class="sr-only">Link to this function</span>
-    </a>
-    <h1 class="signature" translate="no">admin_email()</h1>
-
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/views/page_view.ex#L4" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/plausible/analytics/blob/main/test/support/paddle_api_mock.ex#L29" class="view-source" rel="help" title="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
        <span class="sr-only">View Source</span>
      </a>
@@ -240,16 +186,16 @@ Functions
 
   </section>
 </section>
-<section class="detail" id="base_domain/0">
+<section class="detail" id="get_subscription/1">
 
   <div class="detail-header">
-    <a href="#base_domain/0" class="detail-link" title="Link to this function">
+    <a href="#get_subscription/1" class="detail-link" title="Link to this function">
       <i class="ri-link-m" aria-hidden="true"></i>
       <span class="sr-only">Link to this function</span>
     </a>
-    <h1 class="signature" translate="no">base_domain()</h1>
+    <h1 class="signature" translate="no">get_subscription(_)</h1>
 
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/views/page_view.ex#L8" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/plausible/analytics/blob/main/test/support/paddle_api_mock.ex#L2" class="view-source" rel="help" title="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
        <span class="sr-only">View Source</span>
      </a>
@@ -262,16 +208,16 @@ Functions
 
   </section>
 </section>
-<section class="detail" id="plausible_url/0">
+<section class="detail" id="update_subscription/2">
 
   <div class="detail-header">
-    <a href="#plausible_url/0" class="detail-link" title="Link to this function">
+    <a href="#update_subscription/2" class="detail-link" title="Link to this function">
       <i class="ri-link-m" aria-hidden="true"></i>
       <span class="sr-only">Link to this function</span>
     </a>
-    <h1 class="signature" translate="no">plausible_url()</h1>
+    <h1 class="signature" translate="no">update_subscription(_, map)</h1>
 
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/views/page_view.ex#L12" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/plausible/analytics/blob/main/test/support/paddle_api_mock.ex#L16" class="view-source" rel="help" title="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
        <span class="sr-only">View Source</span>
      </a>
@@ -282,60 +228,6 @@ Functions
   <section class="docstring">
 
 
-  </section>
-</section>
-<section class="detail" id="render/2">
-
-    <span id="render/1"></span>
-
-  <div class="detail-header">
-    <a href="#render/2" class="detail-link" title="Link to this function">
-      <i class="ri-link-m" aria-hidden="true"></i>
-      <span class="sr-only">Link to this function</span>
-    </a>
-    <h1 class="signature" translate="no">render(template, assigns \\ %{})</h1>
-
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/views/page_view.ex#L2" class="view-source" rel="help" title="View Source">
-       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
-       <span class="sr-only">View Source</span>
-     </a>
-
-
-  </div>
-
-  <section class="docstring">
-
-<p>Renders the given template locally.</p>
-  </section>
-</section>
-<section class="detail" id="template_not_found/2">
-
-  <div class="detail-header">
-    <a href="#template_not_found/2" class="detail-link" title="Link to this function">
-      <i class="ri-link-m" aria-hidden="true"></i>
-      <span class="sr-only">Link to this function</span>
-    </a>
-    <h1 class="signature" translate="no">template_not_found(template, assigns)</h1>
-
-      <a href="https://github.com/plausible/analytics/blob/main/lib/plausible_web/views/page_view.ex#L2" class="view-source" rel="help" title="View Source">
-       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
-       <span class="sr-only">View Source</span>
-     </a>
-
-
-  </div>
-
-  <section class="docstring">
-
-      <div class="specs">
-
-          <pre translate="no"><span class="attribute">@spec</span> template_not_found(<a href="https://hexdocs.pm/phoenix_view/1.1.2/Phoenix.Template.html#t:name/0">Phoenix.Template.name</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">map</a>()) :: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">no_return</a>()</pre>
-
-      </div>
-
-<p>Callback invoked when no template is found.
-By default it raises but can be customized
-to render a particular template.</p>
   </section>
 </section>
 
