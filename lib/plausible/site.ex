@@ -3,8 +3,8 @@ defmodule Plausible.Site do
   Site schema
   """
   use Ecto.Schema
+  use Plausible
   import Ecto.Changeset
-  alias Plausible.Auth.User
   alias Plausible.Site.GoogleAuth
 
   @type t() :: %__MODULE__{}
@@ -16,42 +16,111 @@ defmodule Plausible.Site do
     field :public, :boolean
     field :locked, :boolean
     field :stats_start_date, :date
+    field :native_stats_start_at, :naive_datetime
+    field :allowed_event_props, {:array, :string}
+    field :conversions_enabled, :boolean, default: true
+    field :props_enabled, :boolean, default: true
+    field :funnels_enabled, :boolean, default: true
 
     field :ingest_rate_limit_scale_seconds, :integer, default: 60
+    # default is set via changeset/2
     field :ingest_rate_limit_threshold, :integer
 
+    field :domain_changed_from, :string
+    field :domain_changed_at, :naive_datetime
+
+    # NOTE: needed by `SiteImports` data migration script
     embeds_one :imported_data, Plausible.Site.ImportedData, on_replace: :update
 
-    many_to_many :members, User, join_through: Plausible.Site.Membership
-    has_many :memberships, Plausible.Site.Membership
-    has_many :invitations, Plausible.Auth.Invitation
+    # NOTE: new teams relations
+    belongs_to :team, Plausible.Teams.Team
+    has_many :guest_memberships, Plausible.Teams.GuestMembership
+    has_many :guest_invitations, Plausible.Teams.GuestInvitation
+
+    embeds_one :installation_meta, Plausible.Site.InstallationMeta,
+      on_replace: :update,
+      defaults_to_struct: true
+
+    has_many :goals, Plausible.Goal, preload_order: [desc: :id]
+    has_many :revenue_goals, Plausible.Goal, where: [currency: {:not, nil}]
     has_one :google_auth, GoogleAuth
     has_one :weekly_report, Plausible.Site.WeeklyReport
     has_one :monthly_report, Plausible.Site.MonthlyReport
-    has_one :custom_domain, Plausible.Site.CustomDomain
-    has_one :spike_notification, Plausible.Site.SpikeNotification
+    has_one :ownership, through: [:team, :ownership]
+    has_one :owner, through: [:team, :owner]
 
     # If `from_cache?` is set, the struct might be incomplete - see `Plausible.Site.Cache`.
     # Use `Plausible.Repo.reload!(cached_site)` to pre-fill missing fields if
     # strictly necessary.
     field :from_cache?, :boolean, virtual: true, default: false
 
+    # Used in the context of paginated sites list to order in relation to
+    # user's membership state. Currently it can be either "invitation",
+    # "pinned_site" or "site", where invitations are first.
+    field :entry_type, :string, virtual: true
+    field :memberships, {:array, :map}, virtual: true
+    field :invitations, {:array, :map}, virtual: true
+    field :pinned_at, :naive_datetime, virtual: true
+
+    # Used for caching imports data for the duration of the whole request
+    # to avoid multiple identical fetches. Populated by plugs putting
+    # `site` in `assigns`.
+    field :import_data_loaded, :boolean, default: false, virtual: true
+    field :earliest_import_start_date, :date, virtual: true
+    field :latest_import_end_date, :date, virtual: true
+    field :complete_import_ids, {:array, :integer}, default: [], virtual: true
+
     timestamps()
+  end
+
+  def new_for_team(team, params) do
+    params
+    |> new()
+    |> put_assoc(:team, team)
+  end
+
+  def new(params), do: changeset(%__MODULE__{}, params)
+
+  on_ee do
+    @domain_unique_error """
+    This domain cannot be registered. Perhaps one of your colleagues registered it? If that's not the case, please contact support@plausible.io
+    """
+  else
+    @domain_unique_error """
+    This domain cannot be registered. Perhaps one of your colleagues registered it?
+    """
   end
 
   def changeset(site, attrs \\ %{}) do
     site
     |> cast(attrs, [:domain, :timezone])
-    |> validate_required([:domain, :timezone])
     |> clean_domain()
-    |> validate_format(:domain, ~r/^[-\.\\\/:\p{L}\d]*$/u,
-      message: "only letters, numbers, slashes and period allowed"
-    )
+    |> validate_required([:domain, :timezone])
+    |> validate_timezone()
+    |> validate_domain_format()
     |> validate_domain_reserved_characters()
     |> unique_constraint(:domain,
-      message:
-        "This domain has already been taken. Perhaps one of your team members registered it? If that's not the case, please contact support@plausible.io"
+      message: @domain_unique_error
     )
+    |> unique_constraint(:domain,
+      name: "domain_change_disallowed",
+      message: @domain_unique_error
+    )
+    |> put_change(
+      :ingest_rate_limit_threshold,
+      Application.get_env(:plausible, __MODULE__)[:default_ingest_threshold]
+    )
+  end
+
+  def update_changeset(site, attrs \\ %{}, opts \\ []) do
+    at =
+      opts
+      |> Keyword.get(:at, NaiveDateTime.utc_now())
+      |> NaiveDateTime.truncate(:second)
+
+    site
+    |> changeset(attrs)
+    |> handle_domain_change(at)
   end
 
   def crm_changeset(site, attrs) do
@@ -59,7 +128,7 @@ defmodule Plausible.Site do
     |> cast(attrs, [
       :timezone,
       :public,
-      :stats_start_date,
+      :native_stats_start_at,
       :ingest_rate_limit_threshold,
       :ingest_rate_limit_scale_seconds
     ])
@@ -74,6 +143,20 @@ defmodule Plausible.Site do
     )
   end
 
+  def tz_offset(site, utc_now \\ DateTime.utc_now()) do
+    case DateTime.shift_zone(utc_now, site.timezone) do
+      {:ok, datetime} ->
+        datetime.utc_offset + datetime.std_offset
+
+      res ->
+        Sentry.capture_message("Unable to determine timezone offset for",
+          extra: %{site: site, result: res}
+        )
+
+        0
+    end
+  end
+
   def make_public(site) do
     change(site, public: true)
   end
@@ -86,87 +169,21 @@ defmodule Plausible.Site do
     change(site, stats_start_date: val)
   end
 
-  def start_import(site, start_date, end_date, imported_source, status \\ "importing") do
-    change(site,
-      imported_data: %{
-        start_date: start_date,
-        end_date: end_date,
-        source: imported_source,
-        status: status
-      }
-    )
-  end
-
-  def import_success(site) do
-    change(site,
-      stats_start_date: site.imported_data.start_date,
-      imported_data: %{status: "ok"}
-    )
-  end
-
-  def import_failure(site) do
-    change(site, imported_data: %{status: "error"})
-  end
-
-  def set_imported_source(site, imported_source) do
-    change(site,
-      imported_data: %Plausible.Site.ImportedData{
-        end_date: Timex.today(),
-        source: imported_source
-      }
-    )
-  end
-
-  def remove_imported_data(site) do
-    change(site, imported_data: nil)
-  end
-
-  @doc """
-  Returns the date of the first recorded stat in the timezone configured by the user.
-  This function does 2 transformations:
-    UTC %NaiveDateTime{} -> Local %DateTime{} -> Local %Date
-
-  ## Examples
-
-    iex> Plausible.Site.local_start_date(%Plausible.Site{stats_start_date: nil})
-    nil
-
-    iex> utc_start = ~N[2022-09-28 00:00:00]
-    iex> tz = "Europe/Helsinki"
-    iex> site = %Plausible.Site{stats_start_date: utc_start, timezone: tz}
-    iex> Plausible.Site.local_start_date(site)
-    ~D[2022-09-28]
-
-    iex> utc_start = ~N[2022-09-28 00:00:00]
-    iex> tz = "America/Los_Angeles"
-    iex> site = %Plausible.Site{stats_start_date: utc_start, timezone: tz}
-    iex> Plausible.Site.local_start_date(site)
-    ~D[2022-09-27]
-  """
-  def local_start_date(%__MODULE__{stats_start_date: nil}) do
-    nil
-  end
-
-  def local_start_date(site) do
-    site.stats_start_date
-    |> Timex.Timezone.convert("UTC")
-    |> Timex.Timezone.convert(site.timezone)
-    |> Timex.to_date()
+  def set_native_stats_start_at(site, val) do
+    change(site, native_stats_start_at: val)
   end
 
   defp clean_domain(changeset) do
     clean_domain =
       (get_field(changeset, :domain) || "")
+      |> String.downcase()
       |> String.trim()
       |> String.replace_leading("http://", "")
       |> String.replace_leading("https://", "")
+      |> String.trim("/")
       |> String.replace_leading("www.", "")
-      |> String.replace_trailing("/", "")
-      |> String.downcase()
 
-    change(changeset, %{
-      domain: clean_domain
-    })
+    change(changeset, %{domain: clean_domain})
   end
 
   # https://tools.ietf.org/html/rfc3986#section-2.2
@@ -183,5 +200,46 @@ defmodule Plausible.Site do
     else
       changeset
     end
+  end
+
+  defp validate_domain_format(changeset) do
+    validate_format(changeset, :domain, ~r/^[-\.\\\/:\p{L}\d]*$/u,
+      message: "only letters, numbers, slashes and period allowed"
+    )
+  end
+
+  defp handle_domain_change(changeset, at) do
+    new_domain = get_change(changeset, :domain)
+
+    if new_domain do
+      changeset
+      |> put_change(:domain_changed_from, changeset.data.domain)
+      |> put_change(:domain_changed_at, at)
+      |> unique_constraint(:domain,
+        name: "domain_change_disallowed",
+        message: @domain_unique_error
+      )
+      |> unique_constraint(:domain_changed_from,
+        message: @domain_unique_error
+      )
+    else
+      changeset
+    end
+  end
+
+  defp validate_timezone(changeset) do
+    tz = get_field(changeset, :timezone)
+
+    if Timex.is_valid_timezone?(tz) do
+      changeset
+    else
+      add_error(changeset, :timezone, "is invalid")
+    end
+  end
+end
+
+defimpl FunWithFlags.Actor, for: Plausible.Site do
+  def id(%{domain: domain}) do
+    "site:#{domain}"
   end
 end

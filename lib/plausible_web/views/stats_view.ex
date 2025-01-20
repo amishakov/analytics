@@ -1,9 +1,6 @@
 defmodule PlausibleWeb.StatsView do
   use PlausibleWeb, :view
-
-  def base_domain do
-    PlausibleWeb.Endpoint.host()
-  end
+  use Plausible
 
   def plausible_url do
     PlausibleWeb.Endpoint.url()
@@ -38,34 +35,17 @@ defmodule PlausibleWeb.StatsView do
           "#{billions}B"
         end
 
-      true ->
+      is_integer(n) ->
         Integer.to_string(n)
     end
   end
 
-  def bar(count, all, color \\ :blue) do
-    ~E"""
-    <div class="bg-<%= color %>-100" style="width: <%= bar_width(count, all) %>%; height: 30px"></div>
-    """
-  end
-
   def stats_container_class(conn) do
     cond do
-      conn.assigns[:embedded] && conn.assigns[:width] == "manual" -> ""
-      conn.assigns[:embedded] -> "max-width-screen-lg mx-auto"
-      !conn.assigns[:embedded] -> "container"
+      conn.assigns[:embedded] && conn.params["width"] == "manual" -> "px-6"
+      conn.assigns[:embedded] -> "max-w-screen-xl mx-auto px-6"
+      !conn.assigns[:embedded] -> "container print:max-w-full"
     end
-  end
-
-  defp bar_width(count, all) do
-    max =
-      Enum.max_by(all, fn
-        {_, count} -> count
-        {_, count, _} -> count
-      end)
-      |> elem(1)
-
-    count / max * 100
   end
 
   @doc """

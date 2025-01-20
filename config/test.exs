@@ -6,62 +6,45 @@ config :plausible, PlausibleWeb.Endpoint, server: false
 
 config :bcrypt_elixir, :log_rounds, 4
 
-config :plausible, Plausible.Repo, pool: Ecto.Adapters.SQL.Sandbox
+config :plausible, Plausible.Repo,
+  pool: Ecto.Adapters.SQL.Sandbox,
+  pool_size: System.schedulers_online() * 2
 
 config :plausible, Plausible.ClickhouseRepo,
   loggers: [Ecto.LogEntry],
-  pool_size: 5
+  pool_size: 15
 
 config :plausible, Plausible.Mailer, adapter: Bamboo.TestAdapter
 
 config :plausible,
   paddle_api: Plausible.PaddleApi.Mock,
-  google_api: Plausible.Google.Api.Mock
-
-config :plausible, :google,
-  client_id: "fake_client_id",
-  client_secret: "fake_client_secret"
+  google_api: Plausible.Google.API.Mock
 
 config :bamboo, :refute_timeout, 10
 
-geolix_sample_lookup = %{
-  city: %{geoname_id: 2_988_507, names: %{en: "Paris"}},
-  continent: %{code: "EU", geoname_id: 6_255_148, names: %{en: "Europe"}},
-  country: %{
-    geoname_id: 3_017_382,
-    is_in_european_union: true,
-    iso_code: "FR",
-    names: %{en: "France"}
-  },
-  ip_address: {2, 2, 2, 2},
-  location: %{
-    latitude: 48.8566,
-    longitude: 2.35222,
-    time_zone: "Europe/Paris",
-    weather_code: "FRXX0076"
-  },
-  postal: %{code: "75000"},
-  subdivisions: [
-    %{geoname_id: 3_012_874, iso_code: "IDF", names: %{en: "Île-de-France"}},
-    %{geoname_id: 2_968_815, iso_code: "75", names: %{en: "Paris"}}
-  ]
-}
-
-config :geolix,
-  databases: [
-    %{
-      id: :geolocation,
-      adapter: Geolix.Adapter.Fake,
-      data: %{
-        {1, 1, 1, 1} => %{country: %{iso_code: "US"}},
-        {2, 2, 2, 2} => geolix_sample_lookup,
-        {1, 1, 1, 1, 1, 1, 1, 1} => %{country: %{iso_code: "US"}},
-        {0, 0, 0, 0} => %{country: %{iso_code: "ZZ"}}
-      }
-    }
-  ]
-
 config :plausible,
   session_timeout: 0,
-  http_impl: Plausible.HTTPClient.Mock,
-  sites_by_domain_cache_enabled: false
+  http_impl: Plausible.HTTPClient.Mock
+
+config :plausible, Plausible.Cache, enabled: false
+
+config :ex_money, api_module: Plausible.ExchangeRateMock
+
+config :plausible, Plausible.Ingestion.Counters, enabled: false
+
+config :plausible, Oban, testing: :manual
+
+config :plausible, Plausible.Verification.Checks.FetchBody,
+  req_opts: [
+    plug: {Req.Test, Plausible.Verification.Checks.FetchBody}
+  ]
+
+config :plausible, Plausible.Verification.Checks.Installation,
+  req_opts: [
+    plug: {Req.Test, Plausible.Verification.Checks.Installation}
+  ]
+
+config :plausible, Plausible.HelpScout,
+  req_opts: [
+    plug: {Req.Test, Plausible.HelpScout}
+  ]

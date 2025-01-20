@@ -102,6 +102,7 @@ defmodule Plausible.HTTPClientTest do
              HTTPClient.post(bypass_url(bypass, path: "/any"), headers_no_content_type, params)
   end
 
+  @tag :slow
   test "post/4 accepts finch request opts", %{bypass: bypass} do
     Bypass.expect_once(bypass, "POST", "/timeout", fn conn ->
       Process.sleep(500)
@@ -111,7 +112,7 @@ defmodule Plausible.HTTPClientTest do
     assert {:error, %Mint.TransportError{reason: :timeout}} ==
              HTTPClient.post(bypass_url(bypass, path: "/timeout"), [], %{}, receive_timeout: 100)
 
-    Bypass.down(bypass)
+    Bypass.pass(bypass)
   end
 
   test "non-200 responses are tagged as errors", %{bypass: bypass} do

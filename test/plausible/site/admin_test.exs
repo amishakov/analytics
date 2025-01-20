@@ -1,97 +1,130 @@
-defmodule Plausible.SiteAdminTest do
+defmodule Plausible.Site.AdminTest do
+  use Plausible
   use Plausible.DataCase, async: true
+  use Plausible.Teams.Test
+  use Bamboo.Test
 
-  alias Plausible.{SiteAdmin, ClickhouseRepo, ClickhouseEvent, ClickhouseSession}
+  @subject_prefix if ee?(), do: "[Plausible Analytics] ", else: "[Plausible CE] "
 
-  describe "transfer_data" do
-    test "event and session structs remain the same after transfer" do
-      from_site = insert(:site)
-      to_site = insert(:site)
+  setup do
+    admin_user = insert(:user)
 
-      populate_stats(from_site, [build(:pageview)])
+    conn =
+      %Plug.Conn{assigns: %{current_user: admin_user}}
+      |> Plug.Conn.fetch_query_params()
 
-      event_before = get_event_by_domain(from_site.domain)
-      session_before = get_session_by_domain(from_site.domain)
+    transfer_action = Plausible.SiteAdmin.list_actions(conn)[:transfer_ownership][:action]
 
-      SiteAdmin.transfer_data([from_site], %{"domain" => to_site.domain})
+    transfer_direct_action =
+      Plausible.SiteAdmin.list_actions(conn)[:transfer_ownership_direct][:action]
 
-      event_after = get_event_by_domain(to_site.domain)
-      session_after = get_session_by_domain(to_site.domain)
+    {:ok,
+     %{
+       transfer_action: transfer_action,
+       transfer_direct_action: transfer_direct_action,
+       conn: conn
+     }}
+  end
 
-      assert event_before == %ClickhouseEvent{event_after | transferred_from: ""}
-      assert session_before == %ClickhouseSession{session_after | transferred_from: ""}
-      assert event_after.transferred_from == from_site.domain
-      assert session_after.transferred_from == from_site.domain
+  describe "bulk transferring site ownership" do
+    test "user has to select at least one site", %{conn: conn, transfer_action: action} do
+      assert action.(conn, [], %{}) == {:error, "Please select at least one site from the list"}
     end
 
-    test "transfers all events and sessions" do
-      from_site = insert(:site)
-      to_site = insert(:site)
+    test "new owner must be an existing user", %{conn: conn, transfer_action: action} do
+      site = insert(:site)
 
-      populate_stats(from_site, [
-        build(:pageview, user_id: 123),
-        build(:event, name: "Signup", user_id: 123),
-        build(:pageview, user_id: 456),
-        build(:event, name: "Signup", user_id: 789)
-      ])
-
-      SiteAdmin.transfer_data([from_site], %{"domain" => to_site.domain})
-
-      transferred_events =
-        ClickhouseRepo.all(
-          from e in Plausible.ClickhouseEvent, where: e.domain == ^to_site.domain
-        )
-
-      transferred_sessions =
-        ClickhouseRepo.all(
-          from e in Plausible.ClickhouseSession, where: e.domain == ^to_site.domain
-        )
-
-      assert length(transferred_events) == 4
-      assert length(transferred_sessions) == 3
+      assert action.(conn, [site], %{"email" => "random@email.com"}) ==
+               {:error, "User could not be found"}
     end
 
-    test "updates stats_start_date on site record" do
-      from_site = insert(:site)
-      to_site = insert(:site)
+    test "new owner can't be the same as old owner", %{conn: conn, transfer_action: action} do
+      current_owner = new_user()
+      site = new_site(owner: current_owner)
 
-      populate_stats(from_site, [build(:pageview, timestamp: ~N[2022-01-01 13:21:00])])
-
-      SiteAdmin.transfer_data([from_site], %{"domain" => to_site.domain})
-
-      assert Repo.reload(to_site).stats_start_date == ~D[2022-01-01]
+      assert {:error, "User is already an owner of one of the sites"} =
+               action.(conn, [site], %{"email" => current_owner.email})
     end
 
-    test "session_transfer_query" do
-      actual = SiteAdmin.session_transfer_query("from.com", "to.com")
+    test "initiates ownership transfer for multiple sites in one action", %{
+      conn: conn,
+      transfer_action: action
+    } do
+      current_owner = new_user()
+      new_owner = new_user()
+      site1 = new_site(owner: current_owner)
+      site2 = new_site(owner: current_owner)
 
-      expected =
-        "INSERT INTO sessions (browser, browser_version, city_geoname_id, country_code, domain, duration, entry_meta.key, entry_meta.value, entry_page, events, exit_page, hostname, is_bounce, operating_system, operating_system_version, pageviews, referrer, referrer_source, screen_size, session_id, sign, start, subdivision1_code, subdivision2_code, timestamp, transferred_from, user_id, utm_campaign, utm_content, utm_medium, utm_source, utm_term) SELECT browser, browser_version, city_geoname_id, country_code, 'to.com' as domain, duration, entry_meta.key, entry_meta.value, entry_page, events, exit_page, hostname, is_bounce, operating_system, operating_system_version, pageviews, referrer, referrer_source, screen_size, session_id, sign, start, subdivision1_code, subdivision2_code, timestamp, 'from.com' as transferred_from, user_id, utm_campaign, utm_content, utm_medium, utm_source, utm_term FROM (SELECT * FROM sessions WHERE domain='from.com')"
+      assert :ok = action.(conn, [site1, site2], %{"email" => new_owner.email})
 
-      assert actual == expected
-    end
+      assert_email_delivered_with(
+        to: [nil: new_owner.email],
+        subject: @subject_prefix <> "Request to transfer ownership of #{site1.domain}"
+      )
 
-    test "event_transfer_query" do
-      actual = SiteAdmin.event_transfer_query("from.com", "to.com")
-
-      expected =
-        "INSERT INTO events (browser, browser_version, city_geoname_id, country_code, domain, hostname, meta.key, meta.value, name, operating_system, operating_system_version, pathname, referrer, referrer_source, screen_size, session_id, subdivision1_code, subdivision2_code, timestamp, transferred_from, user_id, utm_campaign, utm_content, utm_medium, utm_source, utm_term) SELECT browser, browser_version, city_geoname_id, country_code, 'to.com' as domain, hostname, meta.key, meta.value, name, operating_system, operating_system_version, pathname, referrer, referrer_source, screen_size, session_id, subdivision1_code, subdivision2_code, timestamp, 'from.com' as transferred_from, user_id, utm_campaign, utm_content, utm_medium, utm_source, utm_term FROM (SELECT * FROM events WHERE domain='from.com')"
-
-      assert actual == expected
+      assert_email_delivered_with(
+        to: [nil: new_owner.email],
+        subject: @subject_prefix <> "Request to transfer ownership of #{site2.domain}"
+      )
     end
   end
 
-  defp get_event_by_domain(domain) do
-    q = from e in Plausible.ClickhouseEvent, where: e.domain == ^domain
+  describe "bulk transferring site ownership directly" do
+    test "user has to select at least one site", %{conn: conn, transfer_direct_action: action} do
+      assert action.(conn, [], %{}) == {:error, "Please select at least one site from the list"}
+    end
 
-    Plausible.ClickhouseRepo.one!(q)
-    |> Map.drop([:__meta__, :domain])
-  end
+    test "new owner must be an existing user", %{conn: conn, transfer_direct_action: action} do
+      site = new_site()
 
-  defp get_session_by_domain(domain) do
-    q = from s in Plausible.ClickhouseSession, where: s.domain == ^domain
+      assert action.(conn, [site], %{"email" => "random@email.com"}) ==
+               {:error, "User could not be found"}
+    end
 
-    Plausible.ClickhouseRepo.one!(q)
-    |> Map.drop([:__meta__, :domain])
+    test "new owner can't be the same as old owner", %{conn: conn, transfer_direct_action: action} do
+      current_owner = new_user()
+      site = new_site(owner: current_owner)
+
+      assert {:error, "User is already an owner of one of the sites"} =
+               action.(conn, [site], %{"email" => current_owner.email})
+    end
+
+    @tag :ee_only
+    test "new owner's plan must accommodate the transferred site", %{
+      conn: conn,
+      transfer_direct_action: action
+    } do
+      today = Date.utc_today()
+      current_owner = new_user()
+
+      new_owner =
+        new_user()
+        |> subscribe_to_growth_plan(last_bill_date: Date.shift(today, day: -5))
+
+      # fills the site limit quota
+      for _ <- 1..10, do: new_site(owner: new_owner)
+
+      site = new_site(owner: current_owner)
+
+      assert {:error, "Plan limits exceeded" <> _} =
+               action.(conn, [site], %{"email" => new_owner.email})
+    end
+
+    test "executes ownership transfer for multiple sites in one action", %{
+      conn: conn,
+      transfer_direct_action: action
+    } do
+      today = Date.utc_today()
+      current_owner = new_user()
+
+      new_owner =
+        new_user()
+        |> subscribe_to_growth_plan(last_bill_date: Date.shift(today, day: -5))
+
+      site1 = new_site(owner: current_owner)
+      site2 = new_site(owner: current_owner)
+
+      assert :ok = action.(conn, [site1, site2], %{"email" => new_owner.email})
+    end
   end
 end

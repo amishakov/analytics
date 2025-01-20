@@ -1,25 +1,16 @@
 defmodule PlausibleWeb.Api.InternalController do
   use PlausibleWeb, :controller
   use Plausible.Repo
-  alias Plausible.Stats.Clickhouse, as: Stats
+  alias Plausible.{Sites, Auth}
+  alias Plausible.Auth.User
 
-  def domain_status(conn, %{"domain" => domain}) do
-    if Stats.has_pageviews?(%Plausible.Site{domain: domain}) do
-      json(conn, "READY")
-    else
-      json(conn, "WAITING")
-    end
-  end
-
-  def sites(conn, params) do
+  def sites(conn, _params) do
     current_user = conn.assigns[:current_user]
 
     if current_user do
-      sites =
-        sites_for(current_user, params)
-        |> buildResponse(conn)
+      sites = sites_for(current_user)
 
-      json(conn, sites)
+      json(conn, %{data: sites})
     else
       PlausibleWeb.Api.Helpers.unauthorized(
         conn,
@@ -28,23 +19,43 @@ defmodule PlausibleWeb.Api.InternalController do
     end
   end
 
-  defp sites_for(user, params) do
-    Repo.paginate(
-      from(
-        s in Plausible.Site,
-        join: sm in Plausible.Site.Membership,
-        on: sm.site_id == s.id,
-        where: sm.user_id == ^user.id,
-        order_by: s.domain
-      ),
-      params
-    )
+  @features %{
+    "funnels" => Plausible.Billing.Feature.Funnels,
+    "props" => Plausible.Billing.Feature.Props,
+    "conversions" => Plausible.Billing.Feature.Goals
+  }
+  def disable_feature(conn, %{"domain" => domain, "feature" => feature}) do
+    with %User{id: user_id} = user <- conn.assigns[:current_user],
+         site <- Sites.get_by_domain(domain),
+         true <-
+           Plausible.Teams.Memberships.has_admin_access?(site, user) ||
+             Auth.is_super_admin?(user_id),
+         {:ok, mod} <- Map.fetch(@features, feature),
+         {:ok, _site} <- mod.toggle(site, user, override: false) do
+      json(conn, "ok")
+    else
+      {:error, :upgrade_required} ->
+        PlausibleWeb.Api.Helpers.payment_required(
+          conn,
+          "This feature is part of the Plausible Business plan. To get access to this feature, please upgrade your account"
+        )
+
+      :error ->
+        PlausibleWeb.Api.Helpers.bad_request(
+          conn,
+          "The feature you tried to disable is not valid. Valid features are: #{@features |> Map.keys() |> Enum.join(", ")}"
+        )
+
+      _ ->
+        PlausibleWeb.Api.Helpers.unauthorized(
+          conn,
+          "You need to be logged in as the owner or admin account of this site"
+        )
+    end
   end
 
-  defp buildResponse({sites, pagination}, conn) do
-    %{
-      data: Enum.map(sites, &%{domain: &1.domain}),
-      pagination: Phoenix.Pagination.JSON.paginate(conn, pagination)
-    }
+  defp sites_for(user) do
+    pagination = Sites.list(user, %{page_size: 9})
+    Enum.map(pagination.entries, &%{domain: &1.domain})
   end
 end

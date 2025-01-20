@@ -8,8 +8,15 @@ defmodule Plausible.PromEx do
     [
       Plugins.Application,
       Plugins.Beam,
+      Plugins.PhoenixLiveView,
       {Plugins.Phoenix, router: PlausibleWeb.Router, endpoint: PlausibleWeb.Endpoint},
-      Plugins.Ecto,
+      {Plugins.Ecto,
+       repos: [
+         Plausible.Repo,
+         Plausible.ClickhouseRepo,
+         Plausible.IngestRepo,
+         Plausible.AsyncInsertRepo
+       ]},
       Plugins.Oban,
       Plausible.PromEx.Plugins.PlausibleMetrics
     ]

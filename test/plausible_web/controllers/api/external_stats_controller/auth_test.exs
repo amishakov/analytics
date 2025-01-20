@@ -1,5 +1,6 @@
 defmodule PlausibleWeb.Api.ExternalStatsController.AuthTest do
   use PlausibleWeb.ConnCase
+  use Plausible.Teams.Test
 
   setup [:create_user, :create_api_key]
 
@@ -46,8 +47,7 @@ defmodule PlausibleWeb.Api.ExternalStatsController.AuthTest do
   end
 
   test "locked site - returns 402", %{conn: conn, api_key: api_key, user: user} do
-    site = insert(:site, members: [user])
-    {1, _} = Plausible.Billing.SiteLocker.set_lock_status_for(user, true)
+    site = new_site(owner: user, locked: true)
 
     conn
     |> with_api_key(api_key)
@@ -56,7 +56,7 @@ defmodule PlausibleWeb.Api.ExternalStatsController.AuthTest do
   end
 
   test "can access with correct API key and site ID", %{conn: conn, user: user, api_key: api_key} do
-    site = insert(:site, members: [user])
+    site = new_site(owner: user)
 
     conn
     |> with_api_key(api_key)
@@ -67,12 +67,13 @@ defmodule PlausibleWeb.Api.ExternalStatsController.AuthTest do
   end
 
   describe "super admin access" do
+    @describetag :ee_only
     setup %{user: user} do
       patch_env(:super_admin_user_ids, [user.id])
     end
 
     test "can access as a super admin", %{conn: conn, api_key: api_key} do
-      site = insert(:site)
+      site = new_site()
 
       conn
       |> with_api_key(api_key)
@@ -87,8 +88,7 @@ defmodule PlausibleWeb.Api.ExternalStatsController.AuthTest do
       api_key: api_key,
       user: user
     } do
-      site = insert(:site, members: [user])
-      {1, _} = Plausible.Billing.SiteLocker.set_lock_status_for(user, true)
+      site = new_site(owner: user, locked: true)
 
       conn
       |> with_api_key(api_key)
@@ -120,6 +120,50 @@ defmodule PlausibleWeb.Api.ExternalStatsController.AuthTest do
     |> assert_error(
       429,
       "Too many API requests. Your API key is limited to 3 requests per hour."
+    )
+  end
+
+  test "can access with either site_id after domain change", %{
+    conn: conn,
+    user: user,
+    api_key: api_key
+  } do
+    old_domain = "old.example.com"
+    new_domain = "new.example.com"
+    site = new_site(domain: old_domain, owner: user)
+
+    Plausible.Site.Domain.change(site, new_domain)
+
+    conn
+    |> with_api_key(api_key)
+    |> get("/api/v1/stats/aggregate", %{"site_id" => new_domain, "metrics" => "pageviews"})
+    |> assert_ok(%{
+      "results" => %{"pageviews" => %{"value" => 0}}
+    })
+
+    conn
+    |> with_api_key(api_key)
+    |> get("/api/v1/stats/aggregate", %{"site_id" => old_domain, "metrics" => "pageviews"})
+    |> assert_ok(%{
+      "results" => %{"pageviews" => %{"value" => 0}}
+    })
+  end
+
+  @tag :ee_only
+  test "returns HTTP 402 when user is on a growth plan", %{
+    conn: conn,
+    user: user,
+    api_key: api_key
+  } do
+    subscribe_to_growth_plan(user)
+    site = new_site(owner: user)
+
+    conn
+    |> with_api_key(api_key)
+    |> get("/api/v1/stats/aggregate", %{"site_id" => site.domain, "metrics" => "pageviews"})
+    |> assert_error(
+      402,
+      "The account that owns this API key does not have access to Stats API."
     )
   end
 

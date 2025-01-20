@@ -15,13 +15,22 @@ defmodule Mix.Tasks.SendPageview do
   @default_domain "dummy.site"
   @default_page "/"
   @default_referrer "https://google.com"
+  @default_event "pageview"
+  @default_props "{}"
+  @default_queryparams ""
   @options [
     ip: :string,
     user_agent: :string,
     domain: :string,
     page: :string,
     referrer: :string,
-    host: :string
+    host: :string,
+    hostname: :string,
+    event: :string,
+    props: :string,
+    revenue_currency: :string,
+    revenue_amount: :string,
+    queryparams: :string
   ]
 
   def run(opts) do
@@ -50,10 +59,12 @@ defmodule Mix.Tasks.SendPageview do
     body = get_body(parsed_opts)
 
     case Plausible.HTTPClient.post(url, headers, body) do
-      {:ok, _} ->
+      {:ok, resp} ->
         IO.puts(
           "✅ Successfully sent #{body[:name]} event to #{url} ✅ \n\nip=#{ip}\nuser_agent=#{user_agent}\nbody= #{inspect(body, pretty: true)}"
         )
+
+        IO.puts("Response headers: " <> inspect(resp.headers, pretty: true))
 
       {:error, e} ->
         IO.puts("❌ Could not send event to #{url}. Got the following error: \n\n #{inspect(e)}")
@@ -76,13 +87,26 @@ defmodule Mix.Tasks.SendPageview do
     domain = Keyword.get(opts, :domain, @default_domain)
     page = Keyword.get(opts, :page, @default_page)
     referrer = Keyword.get(opts, :referrer, @default_referrer)
+    event = Keyword.get(opts, :event, @default_event)
+    props = Keyword.get(opts, :props, @default_props)
+    hostname = Keyword.get(opts, :hostname, domain)
+    queryparams = Keyword.get(opts, :queryparams, @default_queryparams)
+
+    revenue =
+      if Keyword.get(opts, :revenue_currency) do
+        %{
+          currency: Keyword.get(opts, :revenue_currency),
+          amount: Keyword.get(opts, :revenue_amount)
+        }
+      end
 
     %{
-      name: "pageview",
-      url: "http://#{domain}#{page}",
+      name: event,
+      url: "http://#{hostname}#{page}?#{queryparams}",
       domain: domain,
       referrer: referrer,
-      width: 1666
+      props: props,
+      revenue: revenue
     }
   end
 

@@ -1,128 +1,91 @@
 defmodule PlausibleWeb.InvitationController do
   use PlausibleWeb, :controller
-  use Plausible.Repo
-  alias Ecto.Multi
-  alias Plausible.Auth.Invitation
-  alias Plausible.Site.Membership
 
   plug PlausibleWeb.RequireAccountPlug
 
-  @require_owner [:remove_invitation]
-
-  plug PlausibleWeb.AuthorizeSiteAccess,
-       [:owner, :admin] when action in @require_owner
+  plug PlausibleWeb.Plugs.AuthorizeSiteAccess,
+       [:owner, :editor, :admin] when action in [:remove_invitation]
 
   def accept_invitation(conn, %{"invitation_id" => invitation_id}) do
-    invitation =
-      Repo.get_by!(Invitation, invitation_id: invitation_id)
-      |> Repo.preload([:site, :inviter])
+    case Plausible.Site.Memberships.accept_invitation(invitation_id, conn.assigns.current_user) do
+      {:ok, result} ->
+        site =
+          case result do
+            %{guest_memberships: [guest_membership]} ->
+              Plausible.Repo.preload(guest_membership, :site).site
 
-    user = conn.assigns[:current_user]
-    existing_membership = Repo.get_by(Membership, user_id: user.id, site_id: invitation.site.id)
-
-    multi =
-      if invitation.role == :owner do
-        Multi.new()
-        |> downgrade_previous_owner(invitation.site)
-        |> maybe_end_trial_of_new_owner(user)
-      else
-        Multi.new()
-      end
-
-    membership_changeset =
-      (existing_membership ||
-         %Membership{user_id: user.id, site_id: invitation.site.id})
-      |> Membership.changeset(%{role: invitation.role})
-
-    multi =
-      multi
-      |> Multi.insert_or_update(:membership, membership_changeset)
-      |> Multi.delete(:invitation, invitation)
-
-    case Repo.transaction(multi) do
-      {:ok, changes} ->
-        updated_user = Map.get(changes, :user, user)
-        notify_invitation_accepted(invitation)
-        Plausible.Billing.SiteLocker.check_sites_for(updated_user)
+            %{site: site} ->
+              site
+          end
 
         conn
-        |> put_flash(:success, "You now have access to #{invitation.site.domain}")
-        |> redirect(to: "/#{URI.encode_www_form(invitation.site.domain)}")
+        |> put_flash(:success, "You now have access to #{site.domain}")
+        |> redirect(external: "/#{URI.encode_www_form(site.domain)}")
 
-      {:error, _, _} ->
+      {:error, :invitation_not_found} ->
+        conn
+        |> put_flash(:error, "Invitation missing or already accepted")
+        |> redirect(to: "/sites")
+
+      {:error, :already_other_team_member} ->
+        conn
+        |> put_flash(:error, "You already are a team member in another team")
+        |> redirect(to: "/sites")
+
+      {:error, :no_plan} ->
+        conn
+        |> put_flash(:error, "No existing subscription")
+        |> redirect(to: "/sites")
+
+      {:error, {:over_plan_limits, limits}} ->
+        conn
+        |> put_flash(
+          :error,
+          "Plan limits exceeded: #{PlausibleWeb.TextHelpers.pretty_list(limits)}."
+        )
+        |> redirect(to: "/sites")
+
+      {:error, _} ->
         conn
         |> put_flash(:error, "Something went wrong, please try again")
         |> redirect(to: "/sites")
     end
   end
 
-  defp downgrade_previous_owner(multi, site) do
-    prev_owner =
-      from(
-        sm in Plausible.Site.Membership,
-        where: sm.site_id == ^site.id,
-        where: sm.role == :owner
-      )
-
-    Multi.update_all(multi, :prev_owner, prev_owner, set: [role: :admin])
-  end
-
-  defp maybe_end_trial_of_new_owner(multi, new_owner) do
-    if !Application.get_env(:plausible, :is_selfhost) do
-      end_trial_of_new_owner(multi, new_owner)
-    end
-  end
-
-  defp end_trial_of_new_owner(multi, new_owner) do
-    if Plausible.Billing.on_trial?(new_owner) || is_nil(new_owner.trial_expiry_date) do
-      Ecto.Multi.update(multi, :user, Plausible.Auth.User.end_trial(new_owner))
-    else
-      multi
-    end
-  end
-
   def reject_invitation(conn, %{"invitation_id" => invitation_id}) do
-    invitation =
-      Repo.get_by!(Invitation, invitation_id: invitation_id)
-      |> Repo.preload([:site, :inviter])
+    case Plausible.Site.Memberships.reject_invitation(invitation_id, conn.assigns.current_user) do
+      {:ok, invitation} ->
+        conn
+        |> put_flash(:success, "You have rejected the invitation to #{invitation.site.domain}")
+        |> redirect(to: "/sites")
 
-    Repo.delete!(invitation)
-    notify_invitation_rejected(invitation)
-
-    conn
-    |> put_flash(:success, "You have rejected the invitation to #{invitation.site.domain}")
-    |> redirect(to: "/sites")
-  end
-
-  defp notify_invitation_accepted(%Invitation{role: :owner} = invitation) do
-    PlausibleWeb.Email.ownership_transfer_accepted(invitation)
-    |> Plausible.Mailer.send()
-  end
-
-  defp notify_invitation_accepted(invitation) do
-    PlausibleWeb.Email.invitation_accepted(invitation)
-    |> Plausible.Mailer.send()
-  end
-
-  defp notify_invitation_rejected(%Invitation{role: :owner} = invitation) do
-    PlausibleWeb.Email.ownership_transfer_rejected(invitation)
-    |> Plausible.Mailer.send()
-  end
-
-  defp notify_invitation_rejected(invitation) do
-    PlausibleWeb.Email.invitation_rejected(invitation)
-    |> Plausible.Mailer.send()
+      {:error, :invitation_not_found} ->
+        conn
+        |> put_flash(:error, "Invitation missing or already accepted")
+        |> redirect(to: "/sites")
+    end
   end
 
   def remove_invitation(conn, %{"invitation_id" => invitation_id}) do
-    invitation =
-      Repo.get_by!(Invitation, invitation_id: invitation_id, site_id: conn.assigns[:site].id)
-      |> Repo.preload(:site)
+    case Plausible.Site.Memberships.remove_invitation(invitation_id, conn.assigns.site) do
+      {:ok, invitation_or_transfer} ->
+        {site, email} =
+          case invitation_or_transfer do
+            %Plausible.Teams.GuestInvitation{} = guest_invitation ->
+              {guest_invitation.site, guest_invitation.team_invitation.email}
 
-    Repo.delete!(invitation)
+            %Plausible.Teams.SiteTransfer{} = site_transfer ->
+              {site_transfer.site, site_transfer.email}
+          end
 
-    conn
-    |> put_flash(:success, "You have removed the invitation for #{invitation.email}")
-    |> redirect(to: Routes.site_path(conn, :settings_general, invitation.site.domain))
+        conn
+        |> put_flash(:success, "You have removed the invitation for #{email}")
+        |> redirect(external: Routes.site_path(conn, :settings_people, site.domain))
+
+      {:error, :invitation_not_found} ->
+        conn
+        |> put_flash(:error, "Invitation missing or already removed")
+        |> redirect(external: Routes.site_path(conn, :settings_people, conn.assigns.site.domain))
+    end
   end
 end

@@ -1,32 +1,22 @@
 defmodule Plausible.Mailer do
   use Bamboo.Mailer, otp_app: :plausible
+  require Logger
 
-  @spec send(Bamboo.Email.t()) :: :ok | {:error, :hard_bounce} | {:error, :unknown_error}
+  @spec send(Bamboo.Email.t()) :: :ok | {:error, :unknown_error}
   def send(email) do
-    case deliver_now(email) do
-      {:ok, _email} -> :ok
-      {:ok, _email, _response} -> :ok
-      {:error, error} -> handle_error(error)
-    end
-  end
+    try do
+      deliver_now!(email)
+    rescue
+      e ->
+        # this message is ignored by Sentry, only appears in logs
+        log = "Failed to send e-mail:\n\n  " <> Exception.format(:error, e, __STACKTRACE__)
+        # Sentry report is built entirely from crash_reason
+        crash_reason = {e, __STACKTRACE__}
 
-  defp handle_error(%{response: response}) when is_binary(response) do
-    case Jason.decode(response) do
-      {:ok, %{"ErrorCode" => 406}} ->
-        {:error, :hard_bounce}
-
-      {:ok, response} ->
-        Sentry.capture_message("Failed to send e-mail", extra: %{response: response})
+        Logger.error(log, crash_reason: crash_reason)
         {:error, :unknown_error}
-
-      {:error, _any} ->
-        Sentry.capture_message("Failed to send e-mail", extra: %{response: response})
-        {:error, :unknown_error}
+    else
+      _sent_email -> :ok
     end
-  end
-
-  defp handle_error(error) do
-    Sentry.capture_message("Failed to send e-mail", extra: %{response: error})
-    {:error, :unknown_error}
   end
 end
