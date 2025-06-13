@@ -73,13 +73,40 @@ defmodule Plausible.Auth.SSOTest do
         assert {:ok, integration} =
                  SSO.update_integration(integration, %{
                    idp_signin_url: "https://example.com",
-                   idp_entity_id: "some-entity",
+                   idp_entity_id: "  some-entity  ",
                    idp_cert_pem: @cert_pem
                  })
 
         assert integration.config.idp_signin_url == "https://example.com"
         assert integration.config.idp_entity_id == "some-entity"
-        assert integration.config.idp_cert_pem == @cert_pem
+
+        assert X509.Certificate.from_pem(integration.config.idp_cert_pem) ==
+                 X509.Certificate.from_pem(@cert_pem)
+      end
+
+      test "updates integration with whitespace around PEM" do
+        malformed_pem =
+          @cert_pem
+          |> String.split("\n")
+          |> Enum.map_join("\n\n", &("   " <> &1 <> "   "))
+
+        team = new_site().team
+        integration = SSO.initiate_saml_integration(team)
+
+        assert {:ok, integration} =
+                 SSO.update_integration(integration, %{
+                   idp_signin_url: "https://example.com",
+                   idp_entity_id: "some-entity",
+                   idp_cert_pem: malformed_pem
+                 })
+
+        assert integration.config.idp_signin_url == "https://example.com"
+        assert integration.config.idp_entity_id == "some-entity"
+
+        assert integration.config.idp_cert_pem == String.trim(@cert_pem)
+
+        assert X509.Certificate.from_pem(integration.config.idp_cert_pem) ==
+                 X509.Certificate.from_pem(@cert_pem)
       end
 
       test "optionally accepts metadata" do
@@ -179,6 +206,7 @@ defmodule Plausible.Auth.SSOTest do
       test "provisions a new SSO user form identity", %{
         integration: integration,
         domain: domain,
+        sso_domain: sso_domain,
         team: team
       } do
         identity = new_identity("Jane Sculley", "jane@" <> domain)
@@ -192,6 +220,7 @@ defmodule Plausible.Auth.SSOTest do
         assert user.name == identity.name
         assert user.sso_identity_id == identity.id
         assert user.sso_integration_id == integration.id
+        assert user.sso_domain_id == sso_domain.id
         assert user.email_verified
         assert user.last_sso_login
         assert_team_membership(user, team, :viewer)
@@ -200,7 +229,8 @@ defmodule Plausible.Auth.SSOTest do
       test "provisions SSO user from existing user", %{
         integration: integration,
         team: team,
-        domain: domain
+        domain: domain,
+        sso_domain: sso_domain
       } do
         user = new_user(email: "jane@" <> domain, name: "Jane Sculley")
         add_member(team, user: user, role: :editor)
@@ -220,11 +250,17 @@ defmodule Plausible.Auth.SSOTest do
         assert sso_user.name == identity.name
         assert sso_user.sso_identity_id == identity.id
         assert sso_user.sso_integration_id == integration.id
+        assert sso_user.sso_domain_id == sso_domain.id
         assert sso_user.email_verified
         assert sso_user.last_sso_login
       end
 
-      test "provisions existing SSO user", %{integration: integration, team: team, domain: domain} do
+      test "provisions existing SSO user", %{
+        integration: integration,
+        team: team,
+        domain: domain,
+        sso_domain: sso_domain
+      } do
         user = new_user(email: "jane@" <> domain, name: "Jane Sculley")
         add_member(team, user: user, role: :editor)
         identity = new_identity(user.name, user.email)
@@ -239,6 +275,7 @@ defmodule Plausible.Auth.SSOTest do
         assert sso_user.name == identity.name
         assert sso_user.sso_identity_id == identity.id
         assert sso_user.sso_integration_id == integration.id
+        assert sso_user.sso_domain_id == sso_domain.id
         assert sso_user.last_sso_login
       end
 
@@ -303,6 +340,23 @@ defmodule Plausible.Auth.SSOTest do
 
         assert {:error, :over_limit} = SSO.provision_user(identity)
       end
+
+      test "does not provision existing SSO user when email domain is not allowlisted", %{
+        domain: domain
+      } do
+        identity = new_identity("Jane Sculley", "jane@" <> domain)
+
+        assert {:ok, _, _, sso_user} = SSO.provision_user(identity)
+
+        identity =
+          new_identity(
+            "Jane Sculley on New Email",
+            "jane@new.example.com",
+            sso_user.sso_identity_id
+          )
+
+        assert {:error, :integration_not_found} = SSO.provision_user(identity)
+      end
     end
 
     describe "deprovision_user!/1" do
@@ -327,6 +381,7 @@ defmodule Plausible.Auth.SSOTest do
         assert updated_user.type == :standard
         refute updated_user.sso_identity_id
         refute updated_user.sso_integration_id
+        refute updated_user.sso_domain_id
       end
 
       test "handles standard user gracefully without revoking existing sessions" do
@@ -340,6 +395,7 @@ defmodule Plausible.Auth.SSOTest do
         assert updated_user.type == :standard
         refute updated_user.sso_identity_id
         refute updated_user.sso_integration_id
+        refute updated_user.sso_domain_id
       end
     end
 
@@ -371,6 +427,18 @@ defmodule Plausible.Auth.SSOTest do
 
         assert team.policy.sso_default_role == :editor
         assert team.policy.sso_session_timeout_minutes == 360
+      end
+
+      test "returns changeset on invalid input" do
+        team = new_site().team
+
+        assert {:error, changeset} =
+                 SSO.update_policy(team, sso_session_timeout_minutes: "1024000005")
+
+        assert %{sso_session_timeout_minutes: [:number]} =
+                 Ecto.Changeset.traverse_errors(changeset, fn {_msg, opts} ->
+                   opts[:validation]
+                 end)
       end
     end
 
