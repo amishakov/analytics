@@ -12,7 +12,7 @@ defmodule PlausibleWeb.SSOControllerTest do
     alias Plausible.Repo
 
     setup do
-      team = new_site().team
+      team = new_site().team |> Plausible.Teams.complete_setup()
       integration = SSO.initiate_saml_integration(team)
       domain = "example-#{Enum.random(1..10_000)}.com"
 
@@ -122,7 +122,7 @@ defmodule PlausibleWeb.SSOControllerTest do
         domain: domain,
         integration: integration
       } do
-        email = "dana@" <> domain
+        email = "dana.lake@" <> domain
 
         conn =
           post(conn, Routes.sso_path(conn, :saml_consume, integration.identifier), %{
@@ -137,7 +137,7 @@ defmodule PlausibleWeb.SSOControllerTest do
 
         assert user.type == :sso
         assert user.email == email
-        assert user.name == "Some SSO Person"
+        assert user.name == "Dana Lake"
         assert get_session(conn, :user_token) == sso_session.token
       end
 
@@ -179,6 +179,27 @@ defmodule PlausibleWeb.SSOControllerTest do
 
         assert redirected_to(conn, 302) ==
                  Routes.sso_path(conn, :login_form, error: "Wrong email.", return_to: "/sites")
+      end
+    end
+
+    describe "sso_settings/2" do
+      setup [:create_user, :log_in, :create_team]
+
+      test "redirects when team is not setup", %{conn: conn, team: team} do
+        conn = set_current_team(conn, team)
+        conn = get(conn, Routes.sso_path(conn, :sso_settings))
+
+        assert redirected_to(conn, 302) == "/sites"
+      end
+
+      test "renders when team is setup", %{conn: conn, team: team} do
+        team = Plausible.Teams.complete_setup(team)
+        conn = set_current_team(conn, team)
+        conn = get(conn, Routes.sso_path(conn, :sso_settings))
+
+        assert html = html_response(conn, 200)
+
+        assert html =~ "Configure and manage Single Sign-On for your team"
       end
     end
   end
