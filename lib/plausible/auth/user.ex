@@ -40,6 +40,9 @@ defmodule Plausible.Auth.User do
     field :totp_token, :string
     field :totp_last_used_at, :naive_datetime
 
+    # for context perseverance across sessions
+    field :last_team_identifier, Ecto.UUID
+
     on_ee do
       # Fields for SSO
       field :type, Ecto.Enum, values: [:standard, :sso]
@@ -47,6 +50,7 @@ defmodule Plausible.Auth.User do
       field :last_sso_login, :naive_datetime
 
       belongs_to :sso_integration, Plausible.Auth.SSO.Integration, on_replace: :nilify
+      belongs_to :sso_domain, Plausible.Auth.SSO.Domain, on_replace: :nilify
     end
 
     has_many :sessions, Plausible.Auth.UserSession
