@@ -6,16 +6,23 @@ defmodule Plausible.Auth.SSO.DomainsTest do
 
   on_ee do
     use Plausible.Teams.Test
+    use Plausible.Auth.SSO.Domain.Status
+    use Oban.Testing, repo: Plausible.Repo
 
+    alias Plausible.Auth
     alias Plausible.Auth.SSO
     alias Plausible.Teams
 
     setup do
-      team = new_site().team
+      owner = new_user()
+      {:ok, owner, _} = Auth.TOTP.initiate(owner)
+      {:ok, owner, _} = Auth.TOTP.enable(owner, :skip_verify)
+
+      team = new_site(owner: owner).team
 
       integration = SSO.initiate_saml_integration(team)
 
-      {:ok, team: team, integration: integration}
+      {:ok, team: team, owner: owner, integration: integration}
     end
 
     describe "add/2" do
@@ -26,9 +33,9 @@ defmodule Plausible.Auth.SSO.DomainsTest do
 
         assert sso_domain.domain == domain
         assert is_binary(sso_domain.identifier)
-        refute sso_domain.validated_via
-        refute sso_domain.last_validated_at
-        assert sso_domain.status == :pending
+        refute sso_domain.verified_via
+        refute sso_domain.last_verified_at
+        assert sso_domain.status == Status.pending()
       end
 
       test "normalizes domain before adding", %{integration: integration} do
@@ -99,32 +106,70 @@ defmodule Plausible.Auth.SSO.DomainsTest do
     end
 
     describe "verify/2" do
-      test "marks domain as validated when skip_checks? option passed", %{
+      test "marks domain as verified when skip_checks? option passed", %{
         integration: integration
       } do
         domain = generate_domain()
         {:ok, sso_domain} = SSO.Domains.add(integration, domain)
 
-        valid_domain = SSO.Domains.verify(sso_domain, skip_checks?: true)
+        verified_domain = SSO.Domains.verify(sso_domain, skip_checks?: true)
 
-        assert valid_domain.id == sso_domain.id
-        assert valid_domain.validated_via == :dns_txt
-        assert valid_domain.status == :validated
-        assert valid_domain.last_validated_at
+        assert verified_domain.id == sso_domain.id
+        assert verified_domain.verified_via == :dns_txt
+        assert verified_domain.status == Status.verified()
+        assert verified_domain.last_verified_at
       end
 
-      test "does not mark domain as validated when no skip flag passed", %{
+      test "does mark domain as in progress, when no skip flag passed", %{
         integration: integration
       } do
         domain = generate_domain()
         {:ok, sso_domain} = SSO.Domains.add(integration, domain)
 
-        invalid_domain = SSO.Domains.verify(sso_domain, verification_opts: [methods: []])
+        unverified_domain = SSO.Domains.verify(sso_domain, verification_opts: [methods: []])
 
-        assert invalid_domain.id == sso_domain.id
-        refute invalid_domain.validated_via
-        assert invalid_domain.status == :pending
-        assert invalid_domain.last_validated_at
+        assert unverified_domain.id == sso_domain.id
+        refute unverified_domain.verified_via
+        assert unverified_domain.status == Status.in_progress()
+        assert unverified_domain.last_verified_at
+      end
+    end
+
+    describe "start_verification/1" do
+      test "no domain" do
+        assert {:error, :not_found} = SSO.Domains.start_verification("example.com")
+      end
+
+      test "sets domain status to in progress", %{integration: integration} do
+        domain = generate_domain()
+        {:ok, _} = SSO.Domains.add(integration, domain)
+        assert {:ok, sso_domain} = SSO.Domains.start_verification(domain)
+        assert sso_domain.status == Status.in_progress()
+      end
+
+      test "enqueues background work", %{integration: integration} do
+        domain = generate_domain()
+        {:ok, _} = SSO.Domains.add(integration, domain)
+        assert {:ok, _} = SSO.Domains.start_verification(domain)
+
+        assert_enqueued(
+          worker: Plausible.Auth.SSO.Domain.Verification.Worker,
+          args: %{domain: domain}
+        )
+      end
+    end
+
+    describe "cancel_verification/1" do
+      test "no domain" do
+        assert :ok = SSO.Domains.cancel_verification("example.com")
+      end
+
+      test "sets domain status to unverified", %{integration: integration} do
+        domain = generate_domain()
+        {:ok, _} = SSO.Domains.add(integration, domain)
+        assert {:ok, sso_domain} = SSO.Domains.start_verification(domain)
+        assert :ok = SSO.Domains.cancel_verification(domain)
+        assert Repo.reload!(sso_domain).status == Status.unverified()
       end
     end
 
@@ -163,7 +208,7 @@ defmodule Plausible.Auth.SSO.DomainsTest do
         assert found_sso_domain.id == sso_domain.id
       end
 
-      test "returns error if matching domain is not validated", %{integration: integration} do
+      test "returns error if matching domain is not verified", %{integration: integration} do
         domain = generate_domain()
         {:ok, _sso_domain} = SSO.Domains.add(integration, domain)
 
@@ -174,6 +219,123 @@ defmodule Plausible.Auth.SSO.DomainsTest do
         domain = generate_domain()
 
         assert {:error, :not_found} = SSO.Domains.lookup(domain)
+      end
+    end
+
+    describe "check_can_remove/1" do
+      setup %{integration: integration} do
+        domain = generate_domain()
+        {:ok, sso_domain} = SSO.Domains.add(integration, domain)
+
+        {:ok, domain: domain, sso_domain: sso_domain}
+      end
+
+      test "returns ok when all conditions met", %{sso_domain: sso_domain} do
+        assert :ok = SSO.Domains.remove(sso_domain)
+
+        refute Repo.reload(sso_domain)
+      end
+
+      test "returns ok when force SSO enabled and SSO users on other domains present", %{
+        team: team,
+        integration: integration,
+        sso_domain: sso_domain
+      } do
+        other_domain = generate_domain()
+        {:ok, other_sso_domain} = SSO.Domains.add(integration, other_domain)
+        _other_sso_domain = SSO.Domains.verify(other_sso_domain, skip_checks?: true)
+        other_identity = new_identity("Mary Goodwill", "mary@" <> other_domain)
+        {:ok, _, _, _other_sso_user} = SSO.provision_user(other_identity)
+        {:ok, _team} = SSO.set_force_sso(team, :all_but_owners)
+
+        sso_domain = Repo.reload!(sso_domain)
+        assert :ok = SSO.Domains.check_can_remove(sso_domain)
+      end
+
+      test "returns error when force SSO enabled and SSO users only present on current domain", %{
+        team: team,
+        domain: domain,
+        sso_domain: sso_domain
+      } do
+        sso_domain = SSO.Domains.verify(sso_domain, skip_checks?: true)
+        identity = new_identity("Claude Leferge", "claude@" <> domain)
+        {:ok, _, _, _sso_user} = SSO.provision_user(identity)
+        {:ok, _team} = SSO.set_force_sso(team, :all_but_owners)
+
+        sso_domain = Repo.reload!(sso_domain)
+        assert {:error, :force_sso_enabled} = SSO.Domains.check_can_remove(sso_domain)
+      end
+
+      test "returns error when SSO users present on current domain", %{
+        domain: domain,
+        sso_domain: sso_domain
+      } do
+        sso_domain = SSO.Domains.verify(sso_domain, skip_checks?: true)
+        identity = new_identity("Claude Leferge", "claude@" <> domain)
+        {:ok, _, _, _sso_user} = SSO.provision_user(identity)
+
+        sso_domain = Repo.reload!(sso_domain)
+        assert {:error, :sso_users_present} = SSO.Domains.check_can_remove(sso_domain)
+      end
+    end
+
+    describe "remove/1,2" do
+      setup %{integration: integration} do
+        domain = generate_domain()
+        {:ok, sso_domain} = SSO.Domains.add(integration, domain)
+
+        {:ok, domain: domain, sso_domain: sso_domain}
+      end
+
+      test "removes the domain if conditions met", %{sso_domain: sso_domain} do
+        assert :ok = SSO.Domains.remove(sso_domain)
+        refute Repo.reload(sso_domain)
+      end
+
+      test "fails to remove the domain whenSSO users present on it", %{
+        domain: domain,
+        sso_domain: sso_domain
+      } do
+        sso_domain = SSO.Domains.verify(sso_domain, skip_checks?: true)
+        identity = new_identity("Claude Leferge", "claude@" <> domain)
+        {:ok, _, _, _sso_user} = SSO.provision_user(identity)
+
+        assert {:error, :sso_users_present} = SSO.Domains.remove(sso_domain)
+        assert Repo.reload(sso_domain)
+      end
+
+      test "removes the domain and deprovisions SSO users when force flag set", %{
+        domain: domain,
+        sso_domain: sso_domain
+      } do
+        sso_domain = SSO.Domains.verify(sso_domain, skip_checks?: true)
+        identity = new_identity("Claude Leferge", "claude@" <> domain)
+        {:ok, _, _, sso_user} = SSO.provision_user(identity)
+
+        assert :ok = SSO.Domains.remove(sso_domain, force_deprovision?: true)
+        refute Repo.reload(sso_domain)
+
+        # SSO user is deprovisioned
+        sso_user = Repo.reload(sso_user)
+
+        assert sso_user.type == :standard
+        refute sso_user.sso_identity_id
+        refute sso_user.sso_integration_id
+        refute sso_user.sso_domain_id
+      end
+
+      test "fails to remove when force SSO enabled with SSO users only on that domain", %{
+        team: team,
+        domain: domain,
+        sso_domain: sso_domain
+      } do
+        sso_domain = SSO.Domains.verify(sso_domain, skip_checks?: true)
+        identity = new_identity("Claude Leferge", "claude@" <> domain)
+        {:ok, _, _, _sso_user} = SSO.provision_user(identity)
+        {:ok, _} = SSO.set_force_sso(team, :all_but_owners)
+
+        sso_domain = Repo.reload!(sso_domain)
+        assert {:error, :force_sso_enabled} = SSO.Domains.check_can_remove(sso_domain)
       end
     end
 
