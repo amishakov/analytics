@@ -143,7 +143,7 @@ Pages
 the set of natural languages that are preferred as a response to the request.
 Language tags function are provided in <a href="https://hexdocs.pm/ex_cldr/2.42.0/Cldr.LanguageTag.html"><code class="inline">Cldr.LanguageTag</code></a>.</p><p>The format of an <code class="inline">Accept-Language</code> header is as follows in <code class="inline">ABNF</code> format:</p><pre><code class="makeup elixir" translate="no"><span class="w">   </span><span class="nc">Accept</span><span class="o">-</span><span class="nc">Language</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Accept-Language&quot;</span><span class="w"> </span><span class="s">&quot;:&quot;</span><span class="w">
                      </span><span class="mi">1</span><span class="c1">#( language-range [ &quot;;&quot; &quot;q&quot; &quot;=&quot; qvalue ] )</span><span class="w">
-   </span><span class="n">language</span><span class="o">-</span><span class="n">range</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="5316443394-1">(</span><span class="w"> </span><span class="p" data-group-id="5316443394-2">(</span><span class="w"> </span><span class="mi">1</span><span class="o">*</span><span class="mi">8</span><span class="nc">ALPHA</span><span class="w"> </span><span class="o">*</span><span class="p" data-group-id="5316443394-3">(</span><span class="w"> </span><span class="s">&quot;-&quot;</span><span class="w"> </span><span class="mi">1</span><span class="o">*</span><span class="mi">8</span><span class="nc">ALPHA</span><span class="w"> </span><span class="p" data-group-id="5316443394-3">)</span><span class="w"> </span><span class="p" data-group-id="5316443394-2">)</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s">&quot;*&quot;</span><span class="w"> </span><span class="p" data-group-id="5316443394-1">)</span></code></pre><p>Each language-range MAY be given an associated quality value which represents an
+   </span><span class="n">language</span><span class="o">-</span><span class="n">range</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="7065526332-1">(</span><span class="w"> </span><span class="p" data-group-id="7065526332-2">(</span><span class="w"> </span><span class="mi">1</span><span class="o">*</span><span class="mi">8</span><span class="nc">ALPHA</span><span class="w"> </span><span class="o">*</span><span class="p" data-group-id="7065526332-3">(</span><span class="w"> </span><span class="s">&quot;-&quot;</span><span class="w"> </span><span class="mi">1</span><span class="o">*</span><span class="mi">8</span><span class="nc">ALPHA</span><span class="w"> </span><span class="p" data-group-id="7065526332-3">)</span><span class="w"> </span><span class="p" data-group-id="7065526332-2">)</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s">&quot;*&quot;</span><span class="w"> </span><span class="p" data-group-id="7065526332-1">)</span></code></pre><p>Each language-range MAY be given an associated quality value which represents an
 estimate of the user's preference for the languages specified by that range. The
 quality value defaults to &quot;q=1&quot;. For example,</p><pre><code class="makeup elixir" translate="no"><span class="w">   </span><span class="nc">Accept</span><span class="o">-</span><span class="ss">Language</span><span class="p">:</span><span class="w"> </span><span class="n">da</span><span class="p">,</span><span class="w"> </span><span class="n">en</span><span class="o">-</span><span class="n">gb</span><span class="p">;</span><span class="n">q</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span><span class="w"> </span><span class="n">en</span><span class="p">;</span><span class="n">q</span><span class="o">=</span><span class="mf">0.7</span></code></pre><p>would mean: &quot;I prefer Danish, but will accept British English and other types of English.&quot;</p>
     </section>
@@ -255,54 +255,54 @@ a configured <a href="https://hexdocs.pm/ex_cldr/2.42.0/Cldr.html"><code class="
   </a>
   <span class="text">Examples</span>
 </h2>
-<pre><code class="makeup elixir" translate="no"><span class="gp unselectable">iex&gt; </span><span class="nc">Plausible.Cldr.AcceptLanguage</span><span class="o">.</span><span class="n">best_match</span><span class="p" data-group-id="7434767132-1">(</span><span class="s">&quot;da;q=0.1,zh-TW;q=0.3&quot;</span><span class="p">,</span><span class="w"> </span><span class="nc">TestBackend.Cldr</span><span class="p" data-group-id="7434767132-1">)</span><span class="w">
-</span><span class="p" data-group-id="7434767132-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="7434767132-3">%</span><span class="nc" data-group-id="7434767132-3">Cldr.LanguageTag</span><span class="p" data-group-id="7434767132-3">{</span><span class="w">
+<pre><code class="makeup elixir" translate="no"><span class="gp unselectable">iex&gt; </span><span class="nc">Plausible.Cldr.AcceptLanguage</span><span class="o">.</span><span class="n">best_match</span><span class="p" data-group-id="4136162603-1">(</span><span class="s">&quot;da;q=0.1,zh-TW;q=0.3&quot;</span><span class="p">,</span><span class="w"> </span><span class="nc">TestBackend.Cldr</span><span class="p" data-group-id="4136162603-1">)</span><span class="w">
+</span><span class="p" data-group-id="4136162603-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="4136162603-3">%</span><span class="nc" data-group-id="4136162603-3">Cldr.LanguageTag</span><span class="p" data-group-id="4136162603-3">{</span><span class="w">
    </span><span class="ss">backend</span><span class="p">:</span><span class="w"> </span><span class="nc">TestBackend.Cldr</span><span class="p">,</span><span class="w">
    </span><span class="ss">canonical_locale_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;zh-TW&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">cldr_locale_name</span><span class="p">:</span><span class="w"> </span><span class="ss">:&quot;zh-Hant&quot;</span><span class="p">,</span><span class="w">
-   </span><span class="ss">language_subtags</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7434767132-4">[</span><span class="p" data-group-id="7434767132-4">]</span><span class="p">,</span><span class="w">
-   </span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7434767132-5">%{</span><span class="p" data-group-id="7434767132-5">}</span><span class="p">,</span><span class="w">
+   </span><span class="ss">language_subtags</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4136162603-4">[</span><span class="p" data-group-id="4136162603-4">]</span><span class="p">,</span><span class="w">
+   </span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4136162603-5">%{</span><span class="p" data-group-id="4136162603-5">}</span><span class="p">,</span><span class="w">
    </span><span class="ss">gettext_locale_name</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
    </span><span class="ss">language</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;zh&quot;</span><span class="p">,</span><span class="w">
-   </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7434767132-6">%{</span><span class="p" data-group-id="7434767132-6">}</span><span class="p">,</span><span class="w">
-   </span><span class="ss">private_use</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7434767132-7">[</span><span class="p" data-group-id="7434767132-7">]</span><span class="p">,</span><span class="w">
+   </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4136162603-6">%{</span><span class="p" data-group-id="4136162603-6">}</span><span class="p">,</span><span class="w">
+   </span><span class="ss">private_use</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4136162603-7">[</span><span class="p" data-group-id="4136162603-7">]</span><span class="p">,</span><span class="w">
    </span><span class="ss">rbnf_locale_name</span><span class="p">:</span><span class="w"> </span><span class="ss">:&quot;zh-Hant&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">requested_locale_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;zh-TW&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">script</span><span class="p">:</span><span class="w"> </span><span class="ss">:Hant</span><span class="p">,</span><span class="w">
    </span><span class="ss">territory</span><span class="p">:</span><span class="w"> </span><span class="ss">:TW</span><span class="p">,</span><span class="w">
-   </span><span class="ss">transform</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7434767132-8">%{</span><span class="p" data-group-id="7434767132-8">}</span><span class="p">,</span><span class="w">
-   </span><span class="ss">language_variants</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7434767132-9">[</span><span class="p" data-group-id="7434767132-9">]</span><span class="w">
- </span><span class="p" data-group-id="7434767132-3">}</span><span class="p" data-group-id="7434767132-2">}</span><span class="w">
+   </span><span class="ss">transform</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4136162603-8">%{</span><span class="p" data-group-id="4136162603-8">}</span><span class="p">,</span><span class="w">
+   </span><span class="ss">language_variants</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4136162603-9">[</span><span class="p" data-group-id="4136162603-9">]</span><span class="w">
+ </span><span class="p" data-group-id="4136162603-3">}</span><span class="p" data-group-id="4136162603-2">}</span><span class="w">
 
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">Plausible.Cldr.AcceptLanguage</span><span class="o">.</span><span class="n">best_match</span><span class="p" data-group-id="7434767132-10">(</span><span class="s">&quot;da;q=0.1,zh-TW;q=0.3&quot;</span><span class="p">,</span><span class="w"> </span><span class="nc">TestBackend.Cldr</span><span class="p" data-group-id="7434767132-10">)</span><span class="w">
-</span><span class="p" data-group-id="7434767132-11">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="7434767132-12">%</span><span class="nc" data-group-id="7434767132-12">Cldr.LanguageTag</span><span class="p" data-group-id="7434767132-12">{</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Plausible.Cldr.AcceptLanguage</span><span class="o">.</span><span class="n">best_match</span><span class="p" data-group-id="4136162603-10">(</span><span class="s">&quot;da;q=0.1,zh-TW;q=0.3&quot;</span><span class="p">,</span><span class="w"> </span><span class="nc">TestBackend.Cldr</span><span class="p" data-group-id="4136162603-10">)</span><span class="w">
+</span><span class="p" data-group-id="4136162603-11">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="4136162603-12">%</span><span class="nc" data-group-id="4136162603-12">Cldr.LanguageTag</span><span class="p" data-group-id="4136162603-12">{</span><span class="w">
    </span><span class="ss">backend</span><span class="p">:</span><span class="w"> </span><span class="nc">TestBackend.Cldr</span><span class="p">,</span><span class="w">
    </span><span class="ss">canonical_locale_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;zh-TW&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">cldr_locale_name</span><span class="p">:</span><span class="w"> </span><span class="ss">:&quot;zh-Hant&quot;</span><span class="p">,</span><span class="w">
-   </span><span class="ss">language_subtags</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7434767132-13">[</span><span class="p" data-group-id="7434767132-13">]</span><span class="p">,</span><span class="w">
-   </span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7434767132-14">%{</span><span class="p" data-group-id="7434767132-14">}</span><span class="p">,</span><span class="w">
+   </span><span class="ss">language_subtags</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4136162603-13">[</span><span class="p" data-group-id="4136162603-13">]</span><span class="p">,</span><span class="w">
+   </span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4136162603-14">%{</span><span class="p" data-group-id="4136162603-14">}</span><span class="p">,</span><span class="w">
    </span><span class="ss">gettext_locale_name</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
    </span><span class="ss">language</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;zh&quot;</span><span class="p">,</span><span class="w">
-   </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7434767132-15">%{</span><span class="p" data-group-id="7434767132-15">}</span><span class="p">,</span><span class="w">
-   </span><span class="ss">private_use</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7434767132-16">[</span><span class="p" data-group-id="7434767132-16">]</span><span class="p">,</span><span class="w">
+   </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4136162603-15">%{</span><span class="p" data-group-id="4136162603-15">}</span><span class="p">,</span><span class="w">
+   </span><span class="ss">private_use</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4136162603-16">[</span><span class="p" data-group-id="4136162603-16">]</span><span class="p">,</span><span class="w">
    </span><span class="ss">rbnf_locale_name</span><span class="p">:</span><span class="w"> </span><span class="ss">:&quot;zh-Hant&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">requested_locale_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;zh-TW&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">script</span><span class="p">:</span><span class="w"> </span><span class="ss">:Hant</span><span class="p">,</span><span class="w">
    </span><span class="ss">territory</span><span class="p">:</span><span class="w"> </span><span class="ss">:TW</span><span class="p">,</span><span class="w">
-   </span><span class="ss">transform</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7434767132-17">%{</span><span class="p" data-group-id="7434767132-17">}</span><span class="p">,</span><span class="w">
-   </span><span class="ss">language_variants</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7434767132-18">[</span><span class="p" data-group-id="7434767132-18">]</span><span class="w">
- </span><span class="p" data-group-id="7434767132-12">}</span><span class="p" data-group-id="7434767132-11">}</span><span class="w">
+   </span><span class="ss">transform</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4136162603-17">%{</span><span class="p" data-group-id="4136162603-17">}</span><span class="p">,</span><span class="w">
+   </span><span class="ss">language_variants</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4136162603-18">[</span><span class="p" data-group-id="4136162603-18">]</span><span class="w">
+ </span><span class="p" data-group-id="4136162603-12">}</span><span class="p" data-group-id="4136162603-11">}</span><span class="w">
 
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">Plausible.Cldr.AcceptLanguage</span><span class="o">.</span><span class="n">best_match</span><span class="p" data-group-id="7434767132-19">(</span><span class="s">&quot;xx,yy;q=0.3&quot;</span><span class="p" data-group-id="7434767132-19">)</span><span class="w">
-</span><span class="p" data-group-id="7434767132-20">{</span><span class="ss">:error</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="7434767132-21">{</span><span class="nc">Cldr.NoMatchingLocale</span><span class="p">,</span><span class="w">
-  </span><span class="s">&quot;No configured locale could be matched to </span><span class="se">\&quot;</span><span class="s">xx,yy;q=0.3</span><span class="se">\&quot;</span><span class="s">&quot;</span><span class="p" data-group-id="7434767132-21">}</span><span class="p" data-group-id="7434767132-20">}</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Plausible.Cldr.AcceptLanguage</span><span class="o">.</span><span class="n">best_match</span><span class="p" data-group-id="4136162603-19">(</span><span class="s">&quot;xx,yy;q=0.3&quot;</span><span class="p" data-group-id="4136162603-19">)</span><span class="w">
+</span><span class="p" data-group-id="4136162603-20">{</span><span class="ss">:error</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="4136162603-21">{</span><span class="nc">Cldr.NoMatchingLocale</span><span class="p">,</span><span class="w">
+  </span><span class="s">&quot;No configured locale could be matched to </span><span class="se">\&quot;</span><span class="s">xx,yy;q=0.3</span><span class="se">\&quot;</span><span class="s">&quot;</span><span class="p" data-group-id="4136162603-21">}</span><span class="p" data-group-id="4136162603-20">}</span><span class="w">
 
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">Plausible.Cldr.AcceptLanguage</span><span class="o">.</span><span class="n">best_match</span><span class="p" data-group-id="7434767132-22">(</span><span class="s">&quot;invalid_tag&quot;</span><span class="p" data-group-id="7434767132-22">)</span><span class="w">
-</span><span class="p" data-group-id="7434767132-23">{</span><span class="ss">:error</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="7434767132-24">{</span><span class="nc">Cldr.LanguageTag.ParseError</span><span class="p">,</span><span class="w">
-  </span><span class="s">&quot;Expected a BCP47 language tag. Could not parse the remaining </span><span class="se">\&quot;</span><span class="s">g</span><span class="se">\&quot;</span><span class="s"> starting at position 11&quot;</span><span class="p" data-group-id="7434767132-24">}</span><span class="p" data-group-id="7434767132-23">}</span></code></pre>
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Plausible.Cldr.AcceptLanguage</span><span class="o">.</span><span class="n">best_match</span><span class="p" data-group-id="4136162603-22">(</span><span class="s">&quot;invalid_tag&quot;</span><span class="p" data-group-id="4136162603-22">)</span><span class="w">
+</span><span class="p" data-group-id="4136162603-23">{</span><span class="ss">:error</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="4136162603-24">{</span><span class="nc">Cldr.LanguageTag.ParseError</span><span class="p">,</span><span class="w">
+  </span><span class="s">&quot;Expected a BCP47 language tag. Could not parse the remaining </span><span class="se">\&quot;</span><span class="s">g</span><span class="se">\&quot;</span><span class="s"> starting at position 11&quot;</span><span class="p" data-group-id="4136162603-24">}</span><span class="p" data-group-id="4136162603-23">}</span></code></pre>
   </section>
 </section>
 <section class="detail" id="parse/1">
@@ -361,95 +361,95 @@ with an error tuple for each invalid tag added at the end of the list.</p><h2 id
   </a>
   <span class="text">Example</span>
 </h2>
-<pre><code class="makeup elixir" translate="no"><span class="gp unselectable">iex&gt; </span><span class="nc">Cldr.AcceptLanguage</span><span class="o">.</span><span class="n">parse</span><span class="p" data-group-id="5241610698-1">(</span><span class="s">&quot;da,zh-TW;q=0.3&quot;</span><span class="p">,</span><span class="w"> </span><span class="nc">TestBackend.Cldr</span><span class="p" data-group-id="5241610698-1">)</span><span class="w">
-</span><span class="p" data-group-id="5241610698-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="5241610698-3">[</span><span class="w">
-   </span><span class="p" data-group-id="5241610698-4">{</span><span class="mf">1.0</span><span class="p">,</span><span class="w">
-    </span><span class="p" data-group-id="5241610698-5">%</span><span class="nc" data-group-id="5241610698-5">Cldr.LanguageTag</span><span class="p" data-group-id="5241610698-5">{</span><span class="w">
+<pre><code class="makeup elixir" translate="no"><span class="gp unselectable">iex&gt; </span><span class="nc">Cldr.AcceptLanguage</span><span class="o">.</span><span class="n">parse</span><span class="p" data-group-id="5552037314-1">(</span><span class="s">&quot;da,zh-TW;q=0.3&quot;</span><span class="p">,</span><span class="w"> </span><span class="nc">TestBackend.Cldr</span><span class="p" data-group-id="5552037314-1">)</span><span class="w">
+</span><span class="p" data-group-id="5552037314-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="5552037314-3">[</span><span class="w">
+   </span><span class="p" data-group-id="5552037314-4">{</span><span class="mf">1.0</span><span class="p">,</span><span class="w">
+    </span><span class="p" data-group-id="5552037314-5">%</span><span class="nc" data-group-id="5552037314-5">Cldr.LanguageTag</span><span class="p" data-group-id="5552037314-5">{</span><span class="w">
       </span><span class="ss">backend</span><span class="p">:</span><span class="w"> </span><span class="nc">TestBackend.Cldr</span><span class="p">,</span><span class="w">
       </span><span class="ss">canonical_locale_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;da&quot;</span><span class="p">,</span><span class="w">
       </span><span class="ss">cldr_locale_name</span><span class="p">:</span><span class="w"> </span><span class="ss">:da</span><span class="p">,</span><span class="w">
-      </span><span class="ss">language_subtags</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5241610698-6">[</span><span class="p" data-group-id="5241610698-6">]</span><span class="p">,</span><span class="w">
-      </span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5241610698-7">%{</span><span class="p" data-group-id="5241610698-7">}</span><span class="p">,</span><span class="w">
+      </span><span class="ss">language_subtags</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5552037314-6">[</span><span class="p" data-group-id="5552037314-6">]</span><span class="p">,</span><span class="w">
+      </span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5552037314-7">%{</span><span class="p" data-group-id="5552037314-7">}</span><span class="p">,</span><span class="w">
       </span><span class="ss">gettext_locale_name</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
       </span><span class="ss">language</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;da&quot;</span><span class="p">,</span><span class="w">
-      </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5241610698-8">%{</span><span class="p" data-group-id="5241610698-8">}</span><span class="p">,</span><span class="w">
-      </span><span class="ss">private_use</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5241610698-9">[</span><span class="p" data-group-id="5241610698-9">]</span><span class="p">,</span><span class="w">
+      </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5552037314-8">%{</span><span class="p" data-group-id="5552037314-8">}</span><span class="p">,</span><span class="w">
+      </span><span class="ss">private_use</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5552037314-9">[</span><span class="p" data-group-id="5552037314-9">]</span><span class="p">,</span><span class="w">
       </span><span class="ss">rbnf_locale_name</span><span class="p">:</span><span class="w"> </span><span class="ss">:da</span><span class="p">,</span><span class="w">
       </span><span class="ss">requested_locale_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;da&quot;</span><span class="p">,</span><span class="w">
       </span><span class="ss">script</span><span class="p">:</span><span class="w"> </span><span class="ss">:Latn</span><span class="p">,</span><span class="w">
       </span><span class="ss">territory</span><span class="p">:</span><span class="w"> </span><span class="ss">:DK</span><span class="p">,</span><span class="w">
-      </span><span class="ss">transform</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5241610698-10">%{</span><span class="p" data-group-id="5241610698-10">}</span><span class="p">,</span><span class="w">
-      </span><span class="ss">language_variants</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5241610698-11">[</span><span class="p" data-group-id="5241610698-11">]</span><span class="w">
-    </span><span class="p" data-group-id="5241610698-5">}</span><span class="p" data-group-id="5241610698-4">}</span><span class="p">,</span><span class="w">
-   </span><span class="p" data-group-id="5241610698-12">{</span><span class="mf">0.3</span><span class="p">,</span><span class="w">
-    </span><span class="p" data-group-id="5241610698-13">%</span><span class="nc" data-group-id="5241610698-13">Cldr.LanguageTag</span><span class="p" data-group-id="5241610698-13">{</span><span class="w">
+      </span><span class="ss">transform</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5552037314-10">%{</span><span class="p" data-group-id="5552037314-10">}</span><span class="p">,</span><span class="w">
+      </span><span class="ss">language_variants</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5552037314-11">[</span><span class="p" data-group-id="5552037314-11">]</span><span class="w">
+    </span><span class="p" data-group-id="5552037314-5">}</span><span class="p" data-group-id="5552037314-4">}</span><span class="p">,</span><span class="w">
+   </span><span class="p" data-group-id="5552037314-12">{</span><span class="mf">0.3</span><span class="p">,</span><span class="w">
+    </span><span class="p" data-group-id="5552037314-13">%</span><span class="nc" data-group-id="5552037314-13">Cldr.LanguageTag</span><span class="p" data-group-id="5552037314-13">{</span><span class="w">
       </span><span class="ss">backend</span><span class="p">:</span><span class="w"> </span><span class="nc">TestBackend.Cldr</span><span class="p">,</span><span class="w">
       </span><span class="ss">canonical_locale_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;zh-TW&quot;</span><span class="p">,</span><span class="w">
       </span><span class="ss">cldr_locale_name</span><span class="p">:</span><span class="w"> </span><span class="ss">:&quot;zh-Hant&quot;</span><span class="p">,</span><span class="w">
-      </span><span class="ss">language_subtags</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5241610698-14">[</span><span class="p" data-group-id="5241610698-14">]</span><span class="p">,</span><span class="w">
-      </span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5241610698-15">%{</span><span class="p" data-group-id="5241610698-15">}</span><span class="p">,</span><span class="w">
+      </span><span class="ss">language_subtags</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5552037314-14">[</span><span class="p" data-group-id="5552037314-14">]</span><span class="p">,</span><span class="w">
+      </span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5552037314-15">%{</span><span class="p" data-group-id="5552037314-15">}</span><span class="p">,</span><span class="w">
       </span><span class="ss">gettext_locale_name</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
       </span><span class="ss">language</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;zh&quot;</span><span class="p">,</span><span class="w">
-      </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5241610698-16">%{</span><span class="p" data-group-id="5241610698-16">}</span><span class="p">,</span><span class="w">
-      </span><span class="ss">private_use</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5241610698-17">[</span><span class="p" data-group-id="5241610698-17">]</span><span class="p">,</span><span class="w">
+      </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5552037314-16">%{</span><span class="p" data-group-id="5552037314-16">}</span><span class="p">,</span><span class="w">
+      </span><span class="ss">private_use</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5552037314-17">[</span><span class="p" data-group-id="5552037314-17">]</span><span class="p">,</span><span class="w">
       </span><span class="ss">rbnf_locale_name</span><span class="p">:</span><span class="w"> </span><span class="ss">:&quot;zh-Hant&quot;</span><span class="p">,</span><span class="w">
       </span><span class="ss">requested_locale_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;zh-TW&quot;</span><span class="p">,</span><span class="w">
       </span><span class="ss">script</span><span class="p">:</span><span class="w"> </span><span class="ss">:Hant</span><span class="p">,</span><span class="w">
       </span><span class="ss">territory</span><span class="p">:</span><span class="w"> </span><span class="ss">:TW</span><span class="p">,</span><span class="w">
-      </span><span class="ss">transform</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5241610698-18">%{</span><span class="p" data-group-id="5241610698-18">}</span><span class="p">,</span><span class="w">
-      </span><span class="ss">language_variants</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5241610698-19">[</span><span class="p" data-group-id="5241610698-19">]</span><span class="w">
-    </span><span class="p" data-group-id="5241610698-13">}</span><span class="p" data-group-id="5241610698-12">}</span><span class="w">
- </span><span class="p" data-group-id="5241610698-3">]</span><span class="p" data-group-id="5241610698-2">}</span><span class="w">
+      </span><span class="ss">transform</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5552037314-18">%{</span><span class="p" data-group-id="5552037314-18">}</span><span class="p">,</span><span class="w">
+      </span><span class="ss">language_variants</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5552037314-19">[</span><span class="p" data-group-id="5552037314-19">]</span><span class="w">
+    </span><span class="p" data-group-id="5552037314-13">}</span><span class="p" data-group-id="5552037314-12">}</span><span class="w">
+ </span><span class="p" data-group-id="5552037314-3">]</span><span class="p" data-group-id="5552037314-2">}</span><span class="w">
 
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">Plausible.Cldr.AcceptLanguage</span><span class="o">.</span><span class="n">parse</span><span class="p" data-group-id="5241610698-20">(</span><span class="s">&quot;invalid_tag&quot;</span><span class="p" data-group-id="5241610698-20">)</span><span class="w">
-</span><span class="p" data-group-id="5241610698-21">{</span><span class="ss">:error</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="5241610698-22">{</span><span class="nc">Cldr.LanguageTag.ParseError</span><span class="p">,</span><span class="w">
-  </span><span class="s">&quot;Expected a BCP47 language tag. Could not parse the remaining </span><span class="se">\&quot;</span><span class="s">g</span><span class="se">\&quot;</span><span class="s"> starting at position 11&quot;</span><span class="p" data-group-id="5241610698-22">}</span><span class="p" data-group-id="5241610698-21">}</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Plausible.Cldr.AcceptLanguage</span><span class="o">.</span><span class="n">parse</span><span class="p" data-group-id="5552037314-20">(</span><span class="s">&quot;invalid_tag&quot;</span><span class="p" data-group-id="5552037314-20">)</span><span class="w">
+</span><span class="p" data-group-id="5552037314-21">{</span><span class="ss">:error</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="5552037314-22">{</span><span class="nc">Cldr.LanguageTag.ParseError</span><span class="p">,</span><span class="w">
+  </span><span class="s">&quot;Expected a BCP47 language tag. Could not parse the remaining </span><span class="se">\&quot;</span><span class="s">g</span><span class="se">\&quot;</span><span class="s"> starting at position 11&quot;</span><span class="p" data-group-id="5552037314-22">}</span><span class="p" data-group-id="5552037314-21">}</span><span class="w">
 
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">Plausible.Cldr.AcceptLanguage</span><span class="o">.</span><span class="n">parse</span><span class="p" data-group-id="5241610698-23">(</span><span class="s">&quot;da,zh-TW;q=0.3,invalid_tag&quot;</span><span class="p" data-group-id="5241610698-23">)</span><span class="w">
-</span><span class="p" data-group-id="5241610698-24">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="5241610698-25">[</span><span class="w">
-   </span><span class="p" data-group-id="5241610698-26">{</span><span class="mf">1.0</span><span class="p">,</span><span class="w">
-    </span><span class="p" data-group-id="5241610698-27">%</span><span class="nc" data-group-id="5241610698-27">Cldr.LanguageTag</span><span class="p" data-group-id="5241610698-27">{</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Plausible.Cldr.AcceptLanguage</span><span class="o">.</span><span class="n">parse</span><span class="p" data-group-id="5552037314-23">(</span><span class="s">&quot;da,zh-TW;q=0.3,invalid_tag&quot;</span><span class="p" data-group-id="5552037314-23">)</span><span class="w">
+</span><span class="p" data-group-id="5552037314-24">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="5552037314-25">[</span><span class="w">
+   </span><span class="p" data-group-id="5552037314-26">{</span><span class="mf">1.0</span><span class="p">,</span><span class="w">
+    </span><span class="p" data-group-id="5552037314-27">%</span><span class="nc" data-group-id="5552037314-27">Cldr.LanguageTag</span><span class="p" data-group-id="5552037314-27">{</span><span class="w">
       </span><span class="ss">backend</span><span class="p">:</span><span class="w"> </span><span class="nc">TestBackend.Cldr</span><span class="p">,</span><span class="w">
       </span><span class="ss">canonical_locale_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;da&quot;</span><span class="p">,</span><span class="w">
       </span><span class="ss">cldr_locale_name</span><span class="p">:</span><span class="w"> </span><span class="ss">:da</span><span class="p">,</span><span class="w">
-      </span><span class="ss">language_subtags</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5241610698-28">[</span><span class="p" data-group-id="5241610698-28">]</span><span class="p">,</span><span class="w">
-      </span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5241610698-29">%{</span><span class="p" data-group-id="5241610698-29">}</span><span class="p">,</span><span class="w">
+      </span><span class="ss">language_subtags</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5552037314-28">[</span><span class="p" data-group-id="5552037314-28">]</span><span class="p">,</span><span class="w">
+      </span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5552037314-29">%{</span><span class="p" data-group-id="5552037314-29">}</span><span class="p">,</span><span class="w">
       </span><span class="ss">gettext_locale_name</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
       </span><span class="ss">language</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;da&quot;</span><span class="p">,</span><span class="w">
-      </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5241610698-30">%{</span><span class="p" data-group-id="5241610698-30">}</span><span class="p">,</span><span class="w">
-      </span><span class="ss">private_use</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5241610698-31">[</span><span class="p" data-group-id="5241610698-31">]</span><span class="p">,</span><span class="w">
+      </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5552037314-30">%{</span><span class="p" data-group-id="5552037314-30">}</span><span class="p">,</span><span class="w">
+      </span><span class="ss">private_use</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5552037314-31">[</span><span class="p" data-group-id="5552037314-31">]</span><span class="p">,</span><span class="w">
       </span><span class="ss">rbnf_locale_name</span><span class="p">:</span><span class="w"> </span><span class="ss">:da</span><span class="p">,</span><span class="w">
       </span><span class="ss">requested_locale_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;da&quot;</span><span class="p">,</span><span class="w">
       </span><span class="ss">script</span><span class="p">:</span><span class="w"> </span><span class="ss">:Latn</span><span class="p">,</span><span class="w">
       </span><span class="ss">territory</span><span class="p">:</span><span class="w"> </span><span class="ss">:DK</span><span class="p">,</span><span class="w">
-      </span><span class="ss">transform</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5241610698-32">%{</span><span class="p" data-group-id="5241610698-32">}</span><span class="p">,</span><span class="w">
-      </span><span class="ss">language_variants</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5241610698-33">[</span><span class="p" data-group-id="5241610698-33">]</span><span class="w">
-    </span><span class="p" data-group-id="5241610698-27">}</span><span class="p" data-group-id="5241610698-26">}</span><span class="p">,</span><span class="w">
-   </span><span class="p" data-group-id="5241610698-34">{</span><span class="mf">0.3</span><span class="p">,</span><span class="w">
-    </span><span class="p" data-group-id="5241610698-35">%</span><span class="nc" data-group-id="5241610698-35">Cldr.LanguageTag</span><span class="p" data-group-id="5241610698-35">{</span><span class="w">
+      </span><span class="ss">transform</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5552037314-32">%{</span><span class="p" data-group-id="5552037314-32">}</span><span class="p">,</span><span class="w">
+      </span><span class="ss">language_variants</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5552037314-33">[</span><span class="p" data-group-id="5552037314-33">]</span><span class="w">
+    </span><span class="p" data-group-id="5552037314-27">}</span><span class="p" data-group-id="5552037314-26">}</span><span class="p">,</span><span class="w">
+   </span><span class="p" data-group-id="5552037314-34">{</span><span class="mf">0.3</span><span class="p">,</span><span class="w">
+    </span><span class="p" data-group-id="5552037314-35">%</span><span class="nc" data-group-id="5552037314-35">Cldr.LanguageTag</span><span class="p" data-group-id="5552037314-35">{</span><span class="w">
       </span><span class="ss">backend</span><span class="p">:</span><span class="w"> </span><span class="nc">TestBackend.Cldr</span><span class="p">,</span><span class="w">
       </span><span class="ss">canonical_locale_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;zh-TW&quot;</span><span class="p">,</span><span class="w">
       </span><span class="ss">cldr_locale_name</span><span class="p">:</span><span class="w"> </span><span class="ss">:&quot;zh-Hant&quot;</span><span class="p">,</span><span class="w">
-      </span><span class="ss">language_subtags</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5241610698-36">[</span><span class="p" data-group-id="5241610698-36">]</span><span class="p">,</span><span class="w">
-      </span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5241610698-37">%{</span><span class="p" data-group-id="5241610698-37">}</span><span class="p">,</span><span class="w">
+      </span><span class="ss">language_subtags</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5552037314-36">[</span><span class="p" data-group-id="5552037314-36">]</span><span class="p">,</span><span class="w">
+      </span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5552037314-37">%{</span><span class="p" data-group-id="5552037314-37">}</span><span class="p">,</span><span class="w">
       </span><span class="ss">gettext_locale_name</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
       </span><span class="ss">language</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;zh&quot;</span><span class="p">,</span><span class="w">
-      </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5241610698-38">%{</span><span class="p" data-group-id="5241610698-38">}</span><span class="p">,</span><span class="w">
-      </span><span class="ss">private_use</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5241610698-39">[</span><span class="p" data-group-id="5241610698-39">]</span><span class="p">,</span><span class="w">
+      </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5552037314-38">%{</span><span class="p" data-group-id="5552037314-38">}</span><span class="p">,</span><span class="w">
+      </span><span class="ss">private_use</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5552037314-39">[</span><span class="p" data-group-id="5552037314-39">]</span><span class="p">,</span><span class="w">
       </span><span class="ss">rbnf_locale_name</span><span class="p">:</span><span class="w"> </span><span class="ss">:&quot;zh-Hant&quot;</span><span class="p">,</span><span class="w">
       </span><span class="ss">requested_locale_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;zh-TW&quot;</span><span class="p">,</span><span class="w">
       </span><span class="ss">script</span><span class="p">:</span><span class="w"> </span><span class="ss">:Hant</span><span class="p">,</span><span class="w">
       </span><span class="ss">territory</span><span class="p">:</span><span class="w"> </span><span class="ss">:TW</span><span class="p">,</span><span class="w">
-      </span><span class="ss">transform</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5241610698-40">%{</span><span class="p" data-group-id="5241610698-40">}</span><span class="p">,</span><span class="w">
-      </span><span class="ss">language_variants</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5241610698-41">[</span><span class="p" data-group-id="5241610698-41">]</span><span class="w">
-    </span><span class="p" data-group-id="5241610698-35">}</span><span class="p" data-group-id="5241610698-34">}</span><span class="p">,</span><span class="w">
-   </span><span class="p" data-group-id="5241610698-42">{</span><span class="ss">:error</span><span class="p">,</span><span class="w">
-    </span><span class="p" data-group-id="5241610698-43">{</span><span class="nc">Cldr.LanguageTag.ParseError</span><span class="p">,</span><span class="w">
-     </span><span class="s">&quot;Expected a BCP47 language tag. Could not parse the remaining </span><span class="se">\&quot;</span><span class="s">g</span><span class="se">\&quot;</span><span class="s"> starting at position 11&quot;</span><span class="p" data-group-id="5241610698-43">}</span><span class="p" data-group-id="5241610698-42">}</span><span class="w">
- </span><span class="p" data-group-id="5241610698-25">]</span><span class="p" data-group-id="5241610698-24">}</span></code></pre>
+      </span><span class="ss">transform</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5552037314-40">%{</span><span class="p" data-group-id="5552037314-40">}</span><span class="p">,</span><span class="w">
+      </span><span class="ss">language_variants</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5552037314-41">[</span><span class="p" data-group-id="5552037314-41">]</span><span class="w">
+    </span><span class="p" data-group-id="5552037314-35">}</span><span class="p" data-group-id="5552037314-34">}</span><span class="p">,</span><span class="w">
+   </span><span class="p" data-group-id="5552037314-42">{</span><span class="ss">:error</span><span class="p">,</span><span class="w">
+    </span><span class="p" data-group-id="5552037314-43">{</span><span class="nc">Cldr.LanguageTag.ParseError</span><span class="p">,</span><span class="w">
+     </span><span class="s">&quot;Expected a BCP47 language tag. Could not parse the remaining </span><span class="se">\&quot;</span><span class="s">g</span><span class="se">\&quot;</span><span class="s"> starting at position 11&quot;</span><span class="p" data-group-id="5552037314-43">}</span><span class="p" data-group-id="5552037314-42">}</span><span class="w">
+ </span><span class="p" data-group-id="5552037314-25">]</span><span class="p" data-group-id="5552037314-24">}</span></code></pre>
   </section>
 </section>
 <section class="detail" id="parse!/1">
@@ -492,92 +492,92 @@ with an error tuple for each invalid tag added at the end of the list.</p><h2 id
   </a>
   <span class="text">Example</span>
 </h2>
-<pre><code class="makeup elixir" translate="no"><span class="gp unselectable">iex&gt; </span><span class="nc">Plausible.Cldr.AcceptLanguage</span><span class="o">.</span><span class="n">parse!</span><span class="p" data-group-id="5631895527-1">(</span><span class="s">&quot;da,zh-TW;q=0.3&quot;</span><span class="p" data-group-id="5631895527-1">)</span><span class="w">
-</span><span class="p" data-group-id="5631895527-2">[</span><span class="w">
-  </span><span class="p" data-group-id="5631895527-3">{</span><span class="mf">1.0</span><span class="p">,</span><span class="w">
-   </span><span class="p" data-group-id="5631895527-4">%</span><span class="nc" data-group-id="5631895527-4">Cldr.LanguageTag</span><span class="p" data-group-id="5631895527-4">{</span><span class="w">
+<pre><code class="makeup elixir" translate="no"><span class="gp unselectable">iex&gt; </span><span class="nc">Plausible.Cldr.AcceptLanguage</span><span class="o">.</span><span class="n">parse!</span><span class="p" data-group-id="8779046358-1">(</span><span class="s">&quot;da,zh-TW;q=0.3&quot;</span><span class="p" data-group-id="8779046358-1">)</span><span class="w">
+</span><span class="p" data-group-id="8779046358-2">[</span><span class="w">
+  </span><span class="p" data-group-id="8779046358-3">{</span><span class="mf">1.0</span><span class="p">,</span><span class="w">
+   </span><span class="p" data-group-id="8779046358-4">%</span><span class="nc" data-group-id="8779046358-4">Cldr.LanguageTag</span><span class="p" data-group-id="8779046358-4">{</span><span class="w">
      </span><span class="ss">backend</span><span class="p">:</span><span class="w"> </span><span class="nc">TestBackend.Cldr</span><span class="p">,</span><span class="w">
      </span><span class="ss">canonical_locale_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;da&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">cldr_locale_name</span><span class="p">:</span><span class="w"> </span><span class="ss">:da</span><span class="p">,</span><span class="w">
-     </span><span class="ss">language_subtags</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5631895527-5">[</span><span class="p" data-group-id="5631895527-5">]</span><span class="p">,</span><span class="w">
-     </span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5631895527-6">%{</span><span class="p" data-group-id="5631895527-6">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">language_subtags</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8779046358-5">[</span><span class="p" data-group-id="8779046358-5">]</span><span class="p">,</span><span class="w">
+     </span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8779046358-6">%{</span><span class="p" data-group-id="8779046358-6">}</span><span class="p">,</span><span class="w">
      </span><span class="ss">gettext_locale_name</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
      </span><span class="ss">language</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;da&quot;</span><span class="p">,</span><span class="w">
-     </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5631895527-7">%{</span><span class="p" data-group-id="5631895527-7">}</span><span class="p">,</span><span class="w">
-     </span><span class="ss">private_use</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5631895527-8">[</span><span class="p" data-group-id="5631895527-8">]</span><span class="p">,</span><span class="w">
+     </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8779046358-7">%{</span><span class="p" data-group-id="8779046358-7">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">private_use</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8779046358-8">[</span><span class="p" data-group-id="8779046358-8">]</span><span class="p">,</span><span class="w">
      </span><span class="ss">rbnf_locale_name</span><span class="p">:</span><span class="w"> </span><span class="ss">:da</span><span class="p">,</span><span class="w">
      </span><span class="ss">requested_locale_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;da&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">script</span><span class="p">:</span><span class="w"> </span><span class="ss">:Latn</span><span class="p">,</span><span class="w">
      </span><span class="ss">territory</span><span class="p">:</span><span class="w"> </span><span class="ss">:DK</span><span class="p">,</span><span class="w">
-     </span><span class="ss">transform</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5631895527-9">%{</span><span class="p" data-group-id="5631895527-9">}</span><span class="p">,</span><span class="w">
-     </span><span class="ss">language_variants</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5631895527-10">[</span><span class="p" data-group-id="5631895527-10">]</span><span class="w">
-   </span><span class="p" data-group-id="5631895527-4">}</span><span class="p" data-group-id="5631895527-3">}</span><span class="p">,</span><span class="w">
-  </span><span class="p" data-group-id="5631895527-11">{</span><span class="mf">0.3</span><span class="p">,</span><span class="w">
-   </span><span class="p" data-group-id="5631895527-12">%</span><span class="nc" data-group-id="5631895527-12">Cldr.LanguageTag</span><span class="p" data-group-id="5631895527-12">{</span><span class="w">
+     </span><span class="ss">transform</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8779046358-9">%{</span><span class="p" data-group-id="8779046358-9">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">language_variants</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8779046358-10">[</span><span class="p" data-group-id="8779046358-10">]</span><span class="w">
+   </span><span class="p" data-group-id="8779046358-4">}</span><span class="p" data-group-id="8779046358-3">}</span><span class="p">,</span><span class="w">
+  </span><span class="p" data-group-id="8779046358-11">{</span><span class="mf">0.3</span><span class="p">,</span><span class="w">
+   </span><span class="p" data-group-id="8779046358-12">%</span><span class="nc" data-group-id="8779046358-12">Cldr.LanguageTag</span><span class="p" data-group-id="8779046358-12">{</span><span class="w">
      </span><span class="ss">backend</span><span class="p">:</span><span class="w"> </span><span class="nc">TestBackend.Cldr</span><span class="p">,</span><span class="w">
      </span><span class="ss">canonical_locale_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;zh-TW&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">cldr_locale_name</span><span class="p">:</span><span class="w"> </span><span class="ss">:&quot;zh-Hant&quot;</span><span class="p">,</span><span class="w">
-     </span><span class="ss">language_subtags</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5631895527-13">[</span><span class="p" data-group-id="5631895527-13">]</span><span class="p">,</span><span class="w">
-     </span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5631895527-14">%{</span><span class="p" data-group-id="5631895527-14">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">language_subtags</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8779046358-13">[</span><span class="p" data-group-id="8779046358-13">]</span><span class="p">,</span><span class="w">
+     </span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8779046358-14">%{</span><span class="p" data-group-id="8779046358-14">}</span><span class="p">,</span><span class="w">
      </span><span class="ss">gettext_locale_name</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
      </span><span class="ss">language</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;zh&quot;</span><span class="p">,</span><span class="w">
-     </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5631895527-15">%{</span><span class="p" data-group-id="5631895527-15">}</span><span class="p">,</span><span class="w">
-     </span><span class="ss">private_use</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5631895527-16">[</span><span class="p" data-group-id="5631895527-16">]</span><span class="p">,</span><span class="w">
+     </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8779046358-15">%{</span><span class="p" data-group-id="8779046358-15">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">private_use</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8779046358-16">[</span><span class="p" data-group-id="8779046358-16">]</span><span class="p">,</span><span class="w">
      </span><span class="ss">rbnf_locale_name</span><span class="p">:</span><span class="w"> </span><span class="ss">:&quot;zh-Hant&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">requested_locale_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;zh-TW&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">script</span><span class="p">:</span><span class="w"> </span><span class="ss">:Hant</span><span class="p">,</span><span class="w">
      </span><span class="ss">territory</span><span class="p">:</span><span class="w"> </span><span class="ss">:TW</span><span class="p">,</span><span class="w">
-     </span><span class="ss">transform</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5631895527-17">%{</span><span class="p" data-group-id="5631895527-17">}</span><span class="p">,</span><span class="w">
-     </span><span class="ss">language_variants</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5631895527-18">[</span><span class="p" data-group-id="5631895527-18">]</span><span class="w">
-   </span><span class="p" data-group-id="5631895527-12">}</span><span class="p" data-group-id="5631895527-11">}</span><span class="w">
-</span><span class="p" data-group-id="5631895527-2">]</span><span class="w">
+     </span><span class="ss">transform</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8779046358-17">%{</span><span class="p" data-group-id="8779046358-17">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">language_variants</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8779046358-18">[</span><span class="p" data-group-id="8779046358-18">]</span><span class="w">
+   </span><span class="p" data-group-id="8779046358-12">}</span><span class="p" data-group-id="8779046358-11">}</span><span class="w">
+</span><span class="p" data-group-id="8779046358-2">]</span><span class="w">
 
 </span><span class="nc">Plausible.Cldr.AcceptLanguage</span><span class="o">.</span><span class="n">parse!</span><span class="w"> </span><span class="s">&quot;invalid_tag&quot;</span><span class="w">
 </span><span class="gt">** (Cldr.AcceptLanguageError) &quot;Expected a BCP47 language tag. Could not parse the remaining &quot;g&quot; starting at position 11
     (ex_cldr) lib/cldr/accept_language.ex:304: Cldr.AcceptLanguage.parse!/1</span><span class="w">
 
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">Plausible.Cldr.AcceptLanguage</span><span class="o">.</span><span class="n">parse!</span><span class="p" data-group-id="5631895527-19">(</span><span class="s">&quot;da,zh-TW;q=0.3,invalid_tag&quot;</span><span class="p" data-group-id="5631895527-19">)</span><span class="w">
-</span><span class="p" data-group-id="5631895527-20">[</span><span class="w">
-  </span><span class="p" data-group-id="5631895527-21">{</span><span class="mf">1.0</span><span class="p">,</span><span class="w">
-   </span><span class="p" data-group-id="5631895527-22">%</span><span class="nc" data-group-id="5631895527-22">Cldr.LanguageTag</span><span class="p" data-group-id="5631895527-22">{</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Plausible.Cldr.AcceptLanguage</span><span class="o">.</span><span class="n">parse!</span><span class="p" data-group-id="8779046358-19">(</span><span class="s">&quot;da,zh-TW;q=0.3,invalid_tag&quot;</span><span class="p" data-group-id="8779046358-19">)</span><span class="w">
+</span><span class="p" data-group-id="8779046358-20">[</span><span class="w">
+  </span><span class="p" data-group-id="8779046358-21">{</span><span class="mf">1.0</span><span class="p">,</span><span class="w">
+   </span><span class="p" data-group-id="8779046358-22">%</span><span class="nc" data-group-id="8779046358-22">Cldr.LanguageTag</span><span class="p" data-group-id="8779046358-22">{</span><span class="w">
      </span><span class="ss">backend</span><span class="p">:</span><span class="w"> </span><span class="nc">TestBackend.Cldr</span><span class="p">,</span><span class="w">
      </span><span class="ss">canonical_locale_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;da&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">cldr_locale_name</span><span class="p">:</span><span class="w"> </span><span class="ss">:da</span><span class="p">,</span><span class="w">
-     </span><span class="ss">language_subtags</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5631895527-23">[</span><span class="p" data-group-id="5631895527-23">]</span><span class="p">,</span><span class="w">
-     </span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5631895527-24">%{</span><span class="p" data-group-id="5631895527-24">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">language_subtags</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8779046358-23">[</span><span class="p" data-group-id="8779046358-23">]</span><span class="p">,</span><span class="w">
+     </span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8779046358-24">%{</span><span class="p" data-group-id="8779046358-24">}</span><span class="p">,</span><span class="w">
      </span><span class="ss">gettext_locale_name</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
      </span><span class="ss">language</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;da&quot;</span><span class="p">,</span><span class="w">
-     </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5631895527-25">%{</span><span class="p" data-group-id="5631895527-25">}</span><span class="p">,</span><span class="w">
-     </span><span class="ss">private_use</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5631895527-26">[</span><span class="p" data-group-id="5631895527-26">]</span><span class="p">,</span><span class="w">
+     </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8779046358-25">%{</span><span class="p" data-group-id="8779046358-25">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">private_use</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8779046358-26">[</span><span class="p" data-group-id="8779046358-26">]</span><span class="p">,</span><span class="w">
      </span><span class="ss">rbnf_locale_name</span><span class="p">:</span><span class="w"> </span><span class="ss">:da</span><span class="p">,</span><span class="w">
      </span><span class="ss">requested_locale_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;da&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">script</span><span class="p">:</span><span class="w"> </span><span class="ss">:Latn</span><span class="p">,</span><span class="w">
      </span><span class="ss">territory</span><span class="p">:</span><span class="w"> </span><span class="ss">:DK</span><span class="p">,</span><span class="w">
-     </span><span class="ss">transform</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5631895527-27">%{</span><span class="p" data-group-id="5631895527-27">}</span><span class="p">,</span><span class="w">
-     </span><span class="ss">language_variants</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5631895527-28">[</span><span class="p" data-group-id="5631895527-28">]</span><span class="w">
-   </span><span class="p" data-group-id="5631895527-22">}</span><span class="p" data-group-id="5631895527-21">}</span><span class="p">,</span><span class="w">
-  </span><span class="p" data-group-id="5631895527-29">{</span><span class="mf">0.3</span><span class="p">,</span><span class="w">
-   </span><span class="p" data-group-id="5631895527-30">%</span><span class="nc" data-group-id="5631895527-30">Cldr.LanguageTag</span><span class="p" data-group-id="5631895527-30">{</span><span class="w">
+     </span><span class="ss">transform</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8779046358-27">%{</span><span class="p" data-group-id="8779046358-27">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">language_variants</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8779046358-28">[</span><span class="p" data-group-id="8779046358-28">]</span><span class="w">
+   </span><span class="p" data-group-id="8779046358-22">}</span><span class="p" data-group-id="8779046358-21">}</span><span class="p">,</span><span class="w">
+  </span><span class="p" data-group-id="8779046358-29">{</span><span class="mf">0.3</span><span class="p">,</span><span class="w">
+   </span><span class="p" data-group-id="8779046358-30">%</span><span class="nc" data-group-id="8779046358-30">Cldr.LanguageTag</span><span class="p" data-group-id="8779046358-30">{</span><span class="w">
      </span><span class="ss">backend</span><span class="p">:</span><span class="w"> </span><span class="nc">TestBackend.Cldr</span><span class="p">,</span><span class="w">
      </span><span class="ss">canonical_locale_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;zh-TW&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">cldr_locale_name</span><span class="p">:</span><span class="w"> </span><span class="ss">:&quot;zh-Hant&quot;</span><span class="p">,</span><span class="w">
-     </span><span class="ss">language_subtags</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5631895527-31">[</span><span class="p" data-group-id="5631895527-31">]</span><span class="p">,</span><span class="w">
-     </span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5631895527-32">%{</span><span class="p" data-group-id="5631895527-32">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">language_subtags</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8779046358-31">[</span><span class="p" data-group-id="8779046358-31">]</span><span class="p">,</span><span class="w">
+     </span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8779046358-32">%{</span><span class="p" data-group-id="8779046358-32">}</span><span class="p">,</span><span class="w">
      </span><span class="ss">gettext_locale_name</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
      </span><span class="ss">language</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;zh&quot;</span><span class="p">,</span><span class="w">
-     </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5631895527-33">%{</span><span class="p" data-group-id="5631895527-33">}</span><span class="p">,</span><span class="w">
-     </span><span class="ss">private_use</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5631895527-34">[</span><span class="p" data-group-id="5631895527-34">]</span><span class="p">,</span><span class="w">
+     </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8779046358-33">%{</span><span class="p" data-group-id="8779046358-33">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">private_use</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8779046358-34">[</span><span class="p" data-group-id="8779046358-34">]</span><span class="p">,</span><span class="w">
      </span><span class="ss">rbnf_locale_name</span><span class="p">:</span><span class="w"> </span><span class="ss">:&quot;zh-Hant&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">requested_locale_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;zh-TW&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">script</span><span class="p">:</span><span class="w"> </span><span class="ss">:Hant</span><span class="p">,</span><span class="w">
      </span><span class="ss">territory</span><span class="p">:</span><span class="w"> </span><span class="ss">:TW</span><span class="p">,</span><span class="w">
-     </span><span class="ss">transform</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5631895527-35">%{</span><span class="p" data-group-id="5631895527-35">}</span><span class="p">,</span><span class="w">
-     </span><span class="ss">language_variants</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5631895527-36">[</span><span class="p" data-group-id="5631895527-36">]</span><span class="w">
-   </span><span class="p" data-group-id="5631895527-30">}</span><span class="p" data-group-id="5631895527-29">}</span><span class="p">,</span><span class="w">
-  </span><span class="p" data-group-id="5631895527-37">{</span><span class="ss">:error</span><span class="p">,</span><span class="w">
-   </span><span class="p" data-group-id="5631895527-38">{</span><span class="nc">Cldr.LanguageTag.ParseError</span><span class="p">,</span><span class="w">
-    </span><span class="s">&quot;Expected a BCP47 language tag. Could not parse the remaining </span><span class="se">\&quot;</span><span class="s">g</span><span class="se">\&quot;</span><span class="s"> starting at position 11&quot;</span><span class="p" data-group-id="5631895527-38">}</span><span class="p" data-group-id="5631895527-37">}</span><span class="w">
-</span><span class="p" data-group-id="5631895527-20">]</span></code></pre>
+     </span><span class="ss">transform</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8779046358-35">%{</span><span class="p" data-group-id="8779046358-35">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">language_variants</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8779046358-36">[</span><span class="p" data-group-id="8779046358-36">]</span><span class="w">
+   </span><span class="p" data-group-id="8779046358-30">}</span><span class="p" data-group-id="8779046358-29">}</span><span class="p">,</span><span class="w">
+  </span><span class="p" data-group-id="8779046358-37">{</span><span class="ss">:error</span><span class="p">,</span><span class="w">
+   </span><span class="p" data-group-id="8779046358-38">{</span><span class="nc">Cldr.LanguageTag.ParseError</span><span class="p">,</span><span class="w">
+    </span><span class="s">&quot;Expected a BCP47 language tag. Could not parse the remaining </span><span class="se">\&quot;</span><span class="s">g</span><span class="se">\&quot;</span><span class="s"> starting at position 11&quot;</span><span class="p" data-group-id="8779046358-38">}</span><span class="p" data-group-id="8779046358-37">}</span><span class="w">
+</span><span class="p" data-group-id="8779046358-20">]</span></code></pre>
   </section>
 </section>
 
